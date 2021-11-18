@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang=it>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Tommaso Bocchietti">
+    <meta name="robots" content="noindex">
+    <title>Tabella visite sito: Bocchio's WebSite</title>
+    <style>
+        @import url("/style.css");
+    </style>
+</head>
+
+<body onload="getData('Utenti')">
+    <h1>Visite Bocchio's WebSite</h1>
+
+    <button onclick="getData('Utenti')">Utenti</button>
+    <button onclick="getData('Visite_sito')">Visite</button>
+    <div id="container"></div>
+
+</body>
+
+<script>
+    const utlis_url = [window.location.host == "localhost" ? "http://localhost:80/" : "https://bocchioutils.altervista.org/"]
+
+
+    function addHeaders(table, keys) {
+        var row = table.insertRow();
+        for (var i = 0; i < keys.length; i++) {
+            var headerCell = document.createElement("th");
+            headerCell.innerHTML = keys[i];
+            row.appendChild(headerCell);
+        }
+    }
+
+    function table(data) {
+        try {
+            var list = document.getElementById("container");
+            list.removeChild(list.childNodes[0]);
+        } catch (error) {
+
+        }
+
+        var table = document.createElement('table');
+        for (var i = 0; i < data.length; i++) {
+
+            var child = data[i];
+            if (i === 0) {
+                addHeaders(table, Object.keys(child));
+            }
+            var row = table.insertRow();
+            Object.keys(child).forEach(function (k) {
+                var cell = row.insertCell();
+                cell.appendChild(document.createTextNode(child[k]));
+            })
+        }
+        document.getElementById('container').appendChild(table);
+    }
+
+
+
+    function getData(type) {
+        console.log('Requets sended')
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log('Data arrived')
+                const return_obj = JSON.parse(xhttp.responseText);
+                console.log(return_obj);
+                table(return_obj.Result.Data)
+            }
+        };
+
+        xhttp.open("POST", utlis_url + "php/getData.php", true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhttp.send("table=" + type);
+    }
+</script>
+
+</html>
