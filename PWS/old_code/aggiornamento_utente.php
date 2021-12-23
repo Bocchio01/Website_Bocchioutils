@@ -1,19 +1,21 @@
 <?php
 include "setting.php";
 
-isData(["color", "font", "nickname"], $return_obj);
+isData(["color", "font", "nickname", "avatar"], $return_obj);
 
 $color = $_POST["color"];
 $font = $_POST["font"];
 $nickname = $_POST["nickname"];
+$avatar = $_POST["avatar"];
 if ($debug) {
     $return_obj->Log[] = "Nickname ricevuto: $nickname";
     $return_obj->Log[] = "Colore ricevuto: $color";
     $return_obj->Log[] = "Font ricevuto: $font";
+    $return_obj->Log[] = "Avatar ricevuto: $avatar";
 }
 
 
-$sql = "UPDATE Utenti SET colore='$color', font='$font' WHERE nickname='$nickname'";
+$sql = "UPDATE PWS_Users SET colore='$color', font='$font', avatar='$avatar' WHERE nickname='$nickname'";
 
 if (!$result = $conn->query($sql)) {
     $return_obj->MySQL_err[] = $conn->error;

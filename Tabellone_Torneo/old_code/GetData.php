@@ -1,13 +1,22 @@
 <?php
 
-include "setting.php";
+include "../php/setting.php";
 
 isData(["table"], $return_obj);
 $table = $_POST["table"];
 
-if ($debug) $return_obj->Log[] = "Tabella selezionata: $table";
+if (isset($_POST['id'])) $id = $_POST["id"]; else $id = 0;
 
-$sql = "SELECT * FROM $table";
+if ($debug) {
+    $return_obj->Log[] = "Tabella selezionata: $table";
+    $return_obj->Log[] = "Id selezionato: $id";
+}
+
+if ($id) {
+    $sql = "SELECT * FROM $table WHERE id_torneo ='$id'";
+} else {
+    $sql = "SELECT * FROM $table";
+}
 
 
 if (!$result = $conn->query($sql)) {
@@ -16,7 +25,7 @@ if (!$result = $conn->query($sql)) {
 }
 
 if ($result->num_rows) {
-    while ($row = $result -> fetch_array(MYSQLI_ASSOC)) {
+    while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
         $return_obj->Result->Data[] = $row;
     }
 } else {

@@ -13,21 +13,7 @@ if (strlen($url) > 127) {
 }
 
 
-$sql = "CREATE TABLE IF NOT EXISTS Visite_sito (
-    url_page VARCHAR(127) NOT NULL,
-    num_visite INT(5) DEFAULT 1,
-    creazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    PRIMARY KEY (url_page))
-    ENGINE=InnoDB";
-
-if (!$conn->query($sql)) {
-    $return_obj->MySQL_err[] = $conn->error;
-    die(returndata($return_obj));
-}
-
-
-$sql = "SELECT num_visite FROM Visite_sito WHERE url_page='$url' limit 1";
+$sql = "SELECT num_visite FROM PWS_Interactions WHERE url_page='$url' limit 1";
 
 if (!$result = $conn->query($sql)) {
     $return_obj->MySQL_err[] = $conn->error;

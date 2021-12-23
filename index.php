@@ -8,7 +8,7 @@ if(!$to_key) {
 
 switch ($to_key) {
     case 'util':
-        header('location: Visite.html', 200);
+        header('location: PWS_Interactions.html', 200);
         break;
 
     default:

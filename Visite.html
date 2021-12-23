@@ -7,21 +7,78 @@
     <meta name="robots" content="noindex">
     <title>Tabella visite sito: Bocchio's WebSite</title>
     <style>
-        @import url("/style.css");
+        @import url("./style.css");
     </style>
+
+    <head>
+        <script src="https://cdn.plot.ly/plotly-2.6.3.min.js"></script>
+    </head>
 </head>
 
-<body onload="getData('Utenti')">
-    <h1>Visite Bocchio's WebSite</h1>
+<body onload="getData('PWS_Users')">
+    <h1>Bocchio's WebSite</h1>
 
-    <button onclick="getData('Utenti')">Utenti</button>
-    <button onclick="getData('Visite_sito')">Visite</button>
+    <button onclick="getData('PWS_Pages')">PWS_Pages</button>
+    <button onclick="getData('PWS_Users')">PWS_Users</button>
+    <button onclick="getData('PWS_Interactions')">PWS_Interactions</button>
+    <button onclick="getData('PWS_Forum')">PWS_Forum</button>
     <div id="container"></div>
+    <div id="tester" style="width:80%;height:600px;margin: auto;"></div>
+
+
+    <!-- <form action="/php/forum.php" method="post">
+        <input type="text" name="nickname" placeholder="Nickname">
+        <input type="text" name="msg" placeholder="msg">
+        <input type="text" name="article_name" placeholder="article_name" value="article_name">
+        <input type="number" name="position" placeholder="position" value="0">
+        <input type="submit" value="Invia">
+    </form> -->
+
 
 </body>
 
 <script>
-    const utlis_url = [window.location.host == "localhost" ? "http://localhost:80/" : "https://bocchioutils.altervista.org/"]
+    TESTER = document.getElementById('tester');
+    var trace1 = {
+        x: [1, 2, 3, 4],
+        y: [10, 15, 13, 17],
+        mode: 'markers',
+        name: 'Scatter'
+    };
+
+    var trace2 = {
+        x: [2, 3, 4, 5],
+        y: [16, 5, 11, 9],
+        mode: 'lines',
+        name: 'Lines'
+    };
+
+    var trace3 = {
+        x: [1, 2, 3, 4],
+        y: [12, 9, 15, 12],
+        mode: 'lines+markers',
+        name: 'Scatter and Lines'
+    };
+
+    var data = [trace1, trace2, trace3];
+
+    var layout = {
+        title: 'Title of the Graph',
+        xaxis: {
+            title: 'x-axis title'
+        },
+        yaxis: {
+            title: 'y-axis title'
+        },
+        margin: {
+            t: 0
+        }
+    };
+
+    Plotly.newPlot(TESTER, data, layout);
+
+
+    const utlis_url = [window.location.host == "localhost" ? "http://localhost:80" : "https://bocchioutils.altervista.org"]
 
 
     function addHeaders(table, keys) {
@@ -60,21 +117,24 @@
 
 
     function getData(type) {
-        console.log('Requets sended')
 
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                console.log('Data arrived')
-                const return_obj = JSON.parse(xhttp.responseText);
-                console.log(return_obj);
-                table(return_obj.Result.Data)
+        const xhttp = new XMLHttpRequest();
+        const FD = new FormData();
+        FD.append('action', 'GetAllData')
+        FD.append('table', type)
+
+        return new Promise((resolve, reject) => {
+            xhttp.onreadystatechange = (e) => {
+                if (xhttp.readyState != 4 && xhttp.status == 200) {
+                    resolve(table(JSON.parse(xhttp.responseText).Result.Data))
+                } else {
+                    reject(console.warn('Errore'))
+                }
             }
-        };
 
-        xhttp.open("POST", utlis_url + "php/getData.php", true);
-        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xhttp.send("table=" + type);
+            xhttp.open("POST", utlis_url + "/PWS/main.php", true);
+            xhttp.send(FD);
+        })
     }
 </script>
 

@@ -2,17 +2,38 @@
 // ["Log", "MySQL_err", "DataReceived_err", "EmailSender_err", "Result"];
 
 // Functions
-function returndata($return_obj) {
-    echo (json_encode($return_obj));
+function returndata($return_obj)
+{
+    echo json_encode($return_obj);
+    // echo '{"status": 3, "mesg": "Incorrect ID"}';
 }
 
-function isData($value, $return_obj) {
-    for ($i=0; $i < count($value); $i++) { 
-        if (empty($_POST[$value[$i]])) {
+function isData($value, $return_obj)
+{
+    for ($i = 0; $i < count($value); $i++) {
+        if (!isset($_POST[$value[$i]])) {
             $return_obj->DataReceived_err[] = "Data not received -> " . $value[$i];
             die(returndata($return_obj));
         }
     }
+}
+
+function Query($conn, $sql, $return_obj)
+{
+    if (!$result = $conn->query($sql)) {
+        $return_obj->Error = $conn->error;
+        $return_obj->Result->Status = 1;
+        die(returndata($return_obj));
+    } else {
+        return $result;
+    }
+}
+
+function GetAllData($conn, $table, $return_obj)
+{
+    $result = Query($conn, "SELECT * FROM $table", $return_obj);
+    if ($result->num_rows) while ($row = $result->fetch_array(MYSQLI_ASSOC)) $return_obj->Result->Data[] = $row;
+    else $return_obj->Log[] = "Nella tabella selezionata non ci sono dati";
 }
 
 // Setting
@@ -21,6 +42,7 @@ $return_obj = new stdClass();
 $return_obj->Result = new stdClass();
 
 header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json; charset=utf-8');
 
 // MySQL variables
 $nomehost = "localhost";

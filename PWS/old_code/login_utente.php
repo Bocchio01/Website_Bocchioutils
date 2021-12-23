@@ -12,7 +12,7 @@ if ($debug) {
 }
 
 
-$sql = "SELECT colore, font, pwd, nickname, verificato FROM Utenti WHERE email = '$email'";
+$sql = "SELECT * FROM PWS_Users WHERE email = '$email'";
 
 if (!$result = $conn->query($sql)) {
     $return_obj->MySQL_err[] = $conn->error;
@@ -26,7 +26,10 @@ if ($result->num_rows) {
 
             $return_obj->Result->Color = $row['colore'];
             $return_obj->Result->Font = $row['font'];
+            $return_obj->Result->Avatar = $row['avatar'];
             $return_obj->Result->Nickname = $row['nickname'];
+            $return_obj->Result->Email = $row['email'];
+            $return_obj->Result->Password = $row['pwd'];
         } else {
             $return_obj->DataReceived_err[] = "Devi ancora verficare l'email";
             die(returndata($return_obj));

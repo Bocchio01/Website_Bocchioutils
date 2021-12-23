@@ -3,6 +3,7 @@
     box-sizing: border-box;
     text-align: center;
     padding: 8px;
+    overflow: auto;
 }
 
 table {
@@ -13,6 +14,7 @@ table {
 th, td {
     text-align: left;
     padding: 8px;
+    white-space: nowrap;
 }
 
 tr:nth-child(even) {
