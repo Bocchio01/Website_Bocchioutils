@@ -78,7 +78,7 @@
     Plotly.newPlot(TESTER, data, layout);
 
 
-    const utlis_url = [window.location.host == "localhost" ? "http://localhost:80" : "https://bocchioutils.altervista.org"]
+    const utlis_url = [window.location.host == "localhost" ? "http://localhost:80" : ""]
 
 
     function addHeaders(table, keys) {
@@ -121,20 +121,20 @@
         const xhttp = new XMLHttpRequest();
         const FD = new FormData();
         FD.append('action', 'GetAllData')
-        FD.append('table', type)
+        FD.append('data', JSON.stringify({ table: type }))
 
-        return new Promise((resolve, reject) => {
-            xhttp.onreadystatechange = (e) => {
-                if (xhttp.readyState != 4 && xhttp.status == 200) {
-                    resolve(table(JSON.parse(xhttp.responseText).Result.Data))
+        xhttp.onreadystatechange = (e) => {
+            if (xhttp.readyState === 4) {
+                if (xhttp.status === 200) {
+                    table(JSON.parse(xhttp.responseText).Data)
                 } else {
-                    reject(console.warn('Errore'))
+                    console.warn('Errore nella richiesta: Status ->' + xhttp.status)
                 }
             }
+        }
 
-            xhttp.open("POST", utlis_url + "/PWS/main.php", true);
-            xhttp.send(FD);
-        })
+        xhttp.open("POST", utlis_url + "/PWS/main.php", true);
+        xhttp.send(FD);
     }
 </script>
 

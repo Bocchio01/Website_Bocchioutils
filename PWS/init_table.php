@@ -6,16 +6,21 @@ $sql = "CREATE TABLE IF NOT EXISTS PWS_Pages (
     id_page INT(4) AUTO_INCREMENT,
     name VARCHAR(127) NULL,
     url VARCHAR(127),
-    type ENUM('Home','Mix','Elenco','Article','Portal','Undefined') DEFAULT 'Undefined' NOT NULL,
+    type ENUM('Home','Mix','Elenco','Article','Portal','Undefined') DEFAULT 'Undefined',
     
     forum BOOLEAN DEFAULT 0,
-    attachment VARCHAR(127) NULL,
+    attachment JSON NULL,
     interactions INT(5) DEFAULT 0,
 
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     PRIMARY KEY (id_page))
-    ENGINE=InnoDB;";
+    ENGINE=InnoDB";
+
+if (!$conn->query($sql)) {
+    $return_obj->MySQL_err[] = $conn->error;
+    die(returndata($return_obj));
+}
 
 
 // Utenti table
@@ -31,11 +36,18 @@ $sql = "CREATE TABLE IF NOT EXISTS PWS_Users (
     -- newsletter BOOLEAN DEFAULT 0,
 
     verified BOOLEAN DEFAULT 0,
+    token VARCHAR(127) DEFAULT NULL,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
-    UNIQUE (email, nickname),
+    UNIQUE (nickname),
+    UNIQUE (email),
     PRIMARY KEY (id_user))
-    ENGINE=InnoDB;";
+    ENGINE=InnoDB";
+
+if (!$conn->query($sql)) {
+    $return_obj->MySQL_err[] = $conn->error;
+    die(returndata($return_obj));
+}
 
 
 // PWS_Interactions table 
@@ -45,7 +57,12 @@ $sql = "CREATE TABLE IF NOT EXISTS PWS_Interactions (
     year INT(4) NOT NULL,
 
     PRIMARY KEY (id))
-    ENGINE=InnoDB;";
+    ENGINE=InnoDB";
+
+if (!$conn->query($sql)) {
+    $return_obj->MySQL_err[] = $conn->error;
+    die(returndata($return_obj));
+}
 
 
 // PWS_Forum table
@@ -65,12 +82,12 @@ $sql = "CREATE TABLE IF NOT EXISTS PWS_Forum (
     FOREIGN KEY (id_user) REFERENCES PWS_Users(id_user) ON DELETE NO ACTION ON UPDATE CASCADE)
     ENGINE=InnoDB";
 
-
-
 if (!$conn->query($sql)) {
     $return_obj->MySQL_err[] = $conn->error;
     die(returndata($return_obj));
 }
+
+
 
 $conn->close();
 if ($debug) {

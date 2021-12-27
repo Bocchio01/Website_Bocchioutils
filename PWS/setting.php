@@ -1,19 +1,18 @@
 <?php
-// ["Log", "MySQL_err", "DataReceived_err", "EmailSender_err", "Result"];
 
 // Functions
-function returndata($return_obj)
+function returndata(stdClass $return_obj, int $code = 0, string $log = null)
 {
+    $return_obj->Log[] = $log;
+    $return_obj->Status = $code;
     echo json_encode($return_obj);
-    // echo '{"status": 3, "mesg": "Incorrect ID"}';
 }
 
-function isData($value, $return_obj)
+function isData(array $value, stdClass $return_obj)
 {
     for ($i = 0; $i < count($value); $i++) {
         if (!isset($_POST[$value[$i]])) {
-            $return_obj->DataReceived_err[] = "Data not received -> " . $value[$i];
-            die(returndata($return_obj));
+            die(returndata($return_obj, 1, "Data not received -> " . $value[$i]));
         }
     }
 }
@@ -21,9 +20,7 @@ function isData($value, $return_obj)
 function Query($conn, $sql, $return_obj)
 {
     if (!$result = $conn->query($sql)) {
-        $return_obj->Error = $conn->error;
-        $return_obj->Result->Status = 1;
-        die(returndata($return_obj));
+        die(returndata($return_obj, 1, $conn->error));
     } else {
         return $result;
     }
@@ -32,14 +29,18 @@ function Query($conn, $sql, $return_obj)
 function GetAllData($conn, $table, $return_obj)
 {
     $result = Query($conn, "SELECT * FROM $table", $return_obj);
-    if ($result->num_rows) while ($row = $result->fetch_array(MYSQLI_ASSOC)) $return_obj->Result->Data[] = $row;
-    else $return_obj->Log[] = "Nella tabella selezionata non ci sono dati";
+    $return_obj->Data = array();
+    if ($result->num_rows) while ($row = $result->fetch_array(MYSQLI_ASSOC)) $return_obj->Data[] = $row;
+    else $return_obj->Log[] = "The table selected is empty";
 }
+
 
 // Setting
 $debug = true;
 $return_obj = new stdClass();
-$return_obj->Result = new stdClass();
+$return_obj->Data = new stdClass();
+$return_obj->Status = -1;
+$return_obj->Log = array();
 
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json; charset=utf-8');
@@ -62,8 +63,7 @@ $message = "<html><body style='width:80%;margin:0px auto'>";
 $conn = new mysqli($nomehost, $nomeuser, $password, $database);
 
 if ($conn->connect_error) {
-    $return_obj->MySQL_err[] = $conn->connect_error;
-    die(print_r(json_encode($return_obj)));
+    die(returndata($return_obj, 1, $conn->connect_error));
 };
 
-if ($debug) $return_obj->Log[] = "Connection with MySQL database opened";
+$return_obj->Log[] = "Connection with MySQL database opened";
