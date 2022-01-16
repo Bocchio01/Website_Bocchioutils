@@ -1,11 +1,8 @@
 <?php
 
 include "../PWS/setting.php";
+if (isset($_POST['data'])) $RCV = json_decode($_POST['data']);
 
-
-foreach ($_POST as $key => $value) {
-    $return_obj->Log[] = "Field " . htmlspecialchars($key) . ": " . htmlspecialchars($value);
-}
 
 $fasi_torneo = [
     0 => "Finale",
@@ -22,8 +19,9 @@ switch ($_POST["action"]) {
             case 'CalcioBalilla_Tornei':
                 $sql = "SELECT * FROM $table";
                 if (($result = Query($conn, $sql, $return_obj))->num_rows) {
+                    $return_obj->Data = array();
                     while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-                        $return_obj->Result->Data[] = $row;
+                        $return_obj->Data[] = $row;
                     }
                 } else {
                     $return_obj->Log[] = "Nella tabella selezionata non ci sono dati";

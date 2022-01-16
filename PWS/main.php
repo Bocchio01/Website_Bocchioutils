@@ -37,6 +37,8 @@ switch ($_POST["action"]) {
         for ($i = 0; $i < count($keys); $i++) {
             # code...
             $url_ricevuto = $keys[$i];
+            if (substr($url_ricevuto, -1) != '/') $url_ricevuto .= '/';
+            
             $result = Query($conn, "SELECT id_page FROM PWS_Pages WHERE url='$url_ricevuto' limit 1", $return_obj);
             $id_page = $result->fetch_array(MYSQLI_ASSOC)['id_page'];
             $id_page_ = $id_page . '_';
@@ -72,7 +74,7 @@ switch ($_POST["action"]) {
             $return_obj->Log[] = "The table selected is empty";
         }
         break;
-        
+
 
     default:
         // die(returndata($return_obj, 1, "No action selected"));
@@ -81,5 +83,4 @@ switch ($_POST["action"]) {
 }
 
 $conn->close();
-$return_obj->Log[] = "Connection with MySQL database closed";
-returndata($return_obj);
+returndata($return_obj, 0, "Connection with MySQL database closed");

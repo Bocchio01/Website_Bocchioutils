@@ -30,14 +30,15 @@ $sql = "CREATE TABLE IF NOT EXISTS PWS_Users (
     email VARCHAR(127),
     password VARCHAR(127),
     
+	dark BOOLEAN DEFAULT 0,
     color VARCHAR(127) DEFAULT '#ffa500',
 	font INT(2) DEFAULT 0,
 	avatar VARCHAR(127) DEFAULT '/icon.png',
-    -- newsletter BOOLEAN DEFAULT 0,
 
     verified BOOLEAN DEFAULT 0,
     token VARCHAR(127) DEFAULT NULL,
-    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login DATETIME DEFAULT CURRENT_TIMESTAMP,
+    creation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     
     UNIQUE (nickname),
     UNIQUE (email),
@@ -71,8 +72,8 @@ $sql = "CREATE TABLE IF NOT EXISTS PWS_Forum (
     id_page INT(4),
     id_user INT(4),
     
-    message VARCHAR(127) NOT NULL,
-	position INT(2) DEFAULT 0,
+    message LONGTEXT NOT NULL,
+	refer INT(2) DEFAULT 0,
     
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     -- ultima_modifica TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

@@ -9,10 +9,7 @@
     <style>
         @import url("./style.css");
     </style>
-
-    <head>
-        <script src="https://cdn.plot.ly/plotly-2.6.3.min.js"></script>
-    </head>
+    <!-- <script src="https://cdn.plot.ly/plotly-2.6.3.min.js"></script> -->
 </head>
 
 <body onload="getData('PWS_Users')">
@@ -75,7 +72,7 @@
         }
     };
 
-    Plotly.newPlot(TESTER, data, layout);
+    // Plotly.newPlot(TESTER, data, layout);
 
 
     const utlis_url = [window.location.host == "localhost" ? "http://localhost:80" : ""]
