@@ -31,12 +31,7 @@ switch ($_POST["action"]) {
 
         Query($conn, "INSERT INTO PWS_Users (nickname, email, password, token) VALUES ('$nickname','$email','$password','$token')", $return_obj);
 
-        $message .= "<h1 style='text-align:center;font-size:25px;margin-bottom:20px'>Benvenuto $nickname!<h1><p style='text-align:left;font-size:15px'>Grazie per aver deciso di iscriverti al mio sito e quindi di supportarmi in quello che faccio :).<br>
-Con questo messaggio voglio semplicemente verificare che l'email inserita nel modulo del sito sia corretta.<br><br>
-Clicca su <a href='https://bocchioutils.altervista.org/PWS/verifica_email.php?token=$token'>questo link</a> per confermarla.<br><br>
-Se pensi che questa email abbia avuto un destinatario erroneo, ignorala.<br><br>
-Il WebMaster di Bocchio's WebSite,<br>
-Tommaso<br></p>";
+        $message .= "<h1 style='text-align:center;font-size:25px;margin-bottom:20px'>Benvenuto $nickname!<h1><p style='text-align:left;font-size:15px'>Grazie per aver deciso di iscriverti al mio sito e quindi di supportarmi in quello che faccio :).<br>Con questo messaggio voglio semplicemente verificare che l'email inserita nel modulo del sito sia corretta.<br><br>Clicca su <a href='https://bocchioutils.altervista.org/PWS/from_email.php?action=VerifyEmailtoken=$token'>questo link</a> per confermarla.<br><br>Se pensi che questa email abbia avuto un destinatario erroneo, ignorala.<br><br>Il WebMaster di Bocchio's WebSite,<br>Tommaso<br></p>";
 
         if (mail($email, $subject, $message .= "</body> </html>", $headers)) $return_obj->Log[] = "Email inviata correttamente a: $email";
         else die(returndata($return_obj, 1, "C'è stato un problema durante l'invio dell'email a: $email"));
@@ -58,10 +53,11 @@ Tommaso<br></p>";
             $row = $result->fetch_array(MYSQLI_ASSOC);
             if ($row['password'] == $password || $token) {
                 if ($row['verified'] == 1) {
+                    $return_obj->Data->id = $row['id_user'];
                     $return_obj->Data->token = $row['token'];
                     $return_obj->Data->nickname = $row['nickname'];
                     $return_obj->Data->email = $row['email'];
-                    $return_obj->Data->password = '';
+                    $return_obj->Data->password = $RCV->password;
 
                     $return_obj->Data->preferences = new stdClass;
                     $return_obj->Data->preferences->dark = (bool) $row['dark'];
@@ -79,5 +75,34 @@ Tommaso<br></p>";
         } else {
             die(returndata($return_obj, 1, "L'utente non esite. Controlla l'email inserita."));
         }
+        break;
+
+    case 'ForgotPassword':
+        $email = strtolower($RCV->email);
+
+        $token = Query($conn, "SELECT token FROM PWS_Users WHERE email='$email' limit 1", $return_obj)->fetch_array(MYSQLI_ASSOC)['token'];
+        echo $token;
+        if ($token) {
+            $message .= "<h1 style='text-align:center;font-size:25px;margin-bottom:20px'>Recupero/cambio credenziali!<h1>
+            <p style='text-align:left;font-size:15px'>Ciao, se hai ricevuto questa email vuol dire che qualcuno ha
+                richiesto un 'recupero password' per l'account creato sul sito 'Bocchio's WebSite' collegato a questa
+                email.<br>Se non sei stato tu a richiedere questo servizio, sarebbe oppurtuno contattassi <a
+                    href='mailto:tommaso.bocchietti@gmail.com?subject=Recupero credenziali sito inaspettato&body=Richiesta effettuata per l'
+                    account legato all email: $email'>l'amministrazione del sito</a><br><br>In caso contrario
+                invece,
+                clicca su <a
+                    href='https://bocchioutils.altervista.org/PWS/from_email.php?action=ForgotPassword&token=$token'>questo
+                    link</a> e potrai generare una nuova password.<br><br>ATTENZIONE!<br>Il link sopra è valevole solo
+                una volta.
+                Nel caso volessi recuperare/cambiare nuovamente la tua password dovrai ri-chiederla dal sito 'Bocchio's
+                WebSite' tramite la schermata di login.<br>Per ragioni di sicurezza, una volta cliccato sul link sopra
+                sarai
+                disconnesso dal tuo account da ogni dispositivo e dovrai ri-loggarti nel sito.<br><br>Il WebMaster di
+                Bocchio's WebSite,<br>Tommaso<br></p>";
+
+            if (mail($email, $subject, $message .= "</body> </html>", $headers)) $return_obj->Data = "L'email con le istruzioni per il recupero credenziali è appena stata inviata a: $email";
+            else die(returndata($return_obj, 1, "C'è stato un problema durante l'invio dell'email a $email con le istruzioni per il recupero credenziali... Riprova"));
+        } else die(returndata($return_obj, 1, "Non esiste alcun utente associato all'email: $email"));
+
         break;
 }

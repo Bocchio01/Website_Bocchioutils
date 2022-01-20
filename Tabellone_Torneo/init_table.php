@@ -4,17 +4,17 @@ include "../PWS/setting.php";
 
 $sql = "CREATE TABLE IF NOT EXISTS CalcioBalilla_Tornei (
     id_torneo int NOT NULL AUTO_INCREMENT,
-    Creatore varchar(127) NOT NULL,
+    Creatore int NOT NULL,
     nome_torneo varchar(127) NOT NULL,
 
     PRIMARY KEY (id_torneo),
     UNIQUE (nome_torneo),
-    FOREIGN KEY (Creatore) REFERENCES PWS_Users(nickname) ON DELETE NO ACTION ON UPDATE CASCADE
+    FOREIGN KEY (Creatore) REFERENCES PWS_Users(id_user) ON DELETE NO ACTION ON UPDATE CASCADE
 
     ) ENGINE=InnoDB";
 
 if (!$conn->query($sql)) {
-    die ($conn->error);
+    die($conn->error);
 }
 echo "CalcioBalilla_Tornei \t-> Status 0\n";
 
@@ -34,7 +34,7 @@ $sql = "CREATE TABLE IF NOT EXISTS CalcioBalilla_Squadre (
     ) ENGINE=InnoDB";
 
 if (!$conn->query($sql)) {
-    die ($conn->error);
+    die($conn->error);
 }
 echo "CalcioBalilla_Squadre \t-> Status 0\n";
 
@@ -59,6 +59,6 @@ $sql = "CREATE TABLE IF NOT EXISTS CalcioBalilla_Tabellone (
     ) ENGINE=InnoDB";
 
 if (!$conn->query($sql)) {
-    die ($conn->error);
+    die($conn->error);
 }
 echo "CalcioBalilla_Tabellone \t-> Status 0\n";

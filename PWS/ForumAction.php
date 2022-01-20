@@ -16,7 +16,7 @@ function ForumGetPost($conn, $url, $return_obj)
         } else {
             $return_obj->Data->isForum = 0;
         }
-    }
+    } else $return_obj->Data->isForum = 0;
 }
 
 switch ($_POST["action"]) {

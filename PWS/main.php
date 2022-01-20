@@ -38,7 +38,7 @@ switch ($_POST["action"]) {
             # code...
             $url_ricevuto = $keys[$i];
             if (substr($url_ricevuto, -1) != '/') $url_ricevuto .= '/';
-            
+
             $result = Query($conn, "SELECT id_page FROM PWS_Pages WHERE url='$url_ricevuto' limit 1", $return_obj);
             $id_page = $result->fetch_array(MYSQLI_ASSOC)['id_page'];
             $id_page_ = $id_page . '_';
@@ -63,16 +63,19 @@ switch ($_POST["action"]) {
         break;
 
     case 'GetAllFile':
-        # code...
         $result = Query($conn, "SELECT attachment, url FROM PWS_Pages", $return_obj);
-        // $return_obj->Data = array();
-        if ($result->num_rows) {
-            while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-                $return_obj->Data->{$row['url']} = json_decode($row['attachment']);
-            }
-        } else {
-            $return_obj->Log[] = "The table selected is empty";
-        }
+        if ($result->num_rows)
+            while ($row = $result->fetch_array(MYSQLI_ASSOC)) $return_obj->Data->{$row['url']} = json_decode($row['attachment']);
+        else $return_obj->Log[] = "The table selected is empty";
+        break;
+
+    case 'NavigationGetFiles':
+        $url = $RCV->url;
+
+        $result = Query($conn, "SELECT attachment FROM PWS_Pages WHERE url='$url' limit 1", $return_obj);
+        if ($result->num_rows) $return_obj->Data = json_decode($result->fetch_array(MYSQLI_ASSOC)['attachment']);
+        else $return_obj->Data = null;
+
         break;
 
 
