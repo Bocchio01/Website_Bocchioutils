@@ -2,15 +2,14 @@
 
 include "../php/setting.php";
 
-isData(["table"], $return_obj);
+isData(["table"]);
 $table = $_POST["table"];
 
-if (isset($_POST['id'])) $id = $_POST["id"]; else $id = 0;
+if (isset($_POST['id'])) $id = $_POST["id"];
+else $id = 0;
 
-if ($debug) {
-    $return_obj->Log[] = "Tabella selezionata: $table";
-    $return_obj->Log[] = "Id selezionato: $id";
-}
+$return_obj->Log[] = "Tabella selezionata: $table";
+$return_obj->Log[] = "Id selezionato: $id";
 
 if ($id) {
     $sql = "SELECT * FROM $table WHERE id_torneo ='$id'";
@@ -29,7 +28,7 @@ if ($result->num_rows) {
         $return_obj->Result->Data[] = $row;
     }
 } else {
-    if ($debug) $return_obj->Log[] = "Nella tabella selezionata non ci sono dati";
+    $return_obj->Log[] = "Nella tabella selezionata non ci sono dati";
 }
 
 $return_obj->Result->Status = 1;

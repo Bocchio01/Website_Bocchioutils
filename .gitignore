@@ -1,3 +1,4 @@
 *.zip
-/lib*
+/_lib*
 /_DB_esportation*
+/_fonts*

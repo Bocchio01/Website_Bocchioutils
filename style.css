@@ -1,37 +1,132 @@
 * {
-    margin: 0px;
-    box-sizing: border-box;
-    text-align: center;
-    padding: 8px;
-    overflow: auto;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  text-align: center;
 }
 
-table {
-    border-collapse: collapse;
-    width: 100%;
+body {
+  background-color: #f0f0f2;
+  font-family: "Segoe UI";
 }
 
-th, td {
-    text-align: left;
-    padding: 8px;
-    white-space: nowrap;
+body header > h1,
+body footer > h2 {
+  margin-block: 15px;
 }
 
-tr:nth-child(even) {
-    background-color: #f2f2f2
+body main {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -ms-flex-preferred-size: initial;
+      flex-basis: initial;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
 }
 
-th {
-    background-color: orange;
-    color: white;
+body main form {
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+  display: block;
+  margin: 0px;
 }
 
-button {
-    padding: 10px 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+body main form > div {
+  font-size: 20px;
+  display: -ms-grid;
+  display: grid;
+  padding: 1em;
+  margin: 15px;
 }
 
-button:hover {
-    box-shadow: 0px 0px 6px 0.5px #5e5e5e;
+body main form > input {
+  width: 100%;
+  border-radius: 0.5em;
+  background-color: #4caf50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+body main form > input:hover {
+  color: black;
+}
+
+body main hr.spacer {
+  margin-inline: 20px;
+}
+
+body main > div.data {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
+  row-gap: 2em;
+  -webkit-column-gap: 2em;
+          column-gap: 2em;
+  width: 100%;
+}
+
+body .card {
+  -webkit-box-shadow: 2px 3px 7px 2px rgba(0, 0, 0, 0.4);
+          box-shadow: 2px 3px 7px 2px rgba(0, 0, 0, 0.4);
+  margin: 15px;
+  border-radius: 0.5em;
+  background-color: #fdfdff;
+}
+
+body .card > hr {
+  margin-block: 20px;
+  margin-inline: 0.5em;
+}
+
+body .graph {
+  padding: 2em;
+}
+
+body .graph > h2 {
+  margin-block: 0px 20px;
+}
+
+body .number {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
+  -webkit-box-align: stretch;
+      -ms-flex-align: stretch;
+          align-items: stretch;
+  width: 100%;
+  padding: 2em;
+}
+
+body .number h2 {
+  margin-block: 0px 20px;
+}
+
+@media (max-width: 1000px) {
+  main {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+  }
 }

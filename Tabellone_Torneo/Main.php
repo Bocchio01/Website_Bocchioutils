@@ -15,13 +15,13 @@ $fasi_torneo = [
 switch ($_POST["action"]) {
 
     case 'RequestTornei':
-        GetAllData($conn, 'CalcioBalilla_Tornei', $return_obj);
+        GetAllData('CalcioBalilla_Tornei');
         break;
 
     case 'RequestSquadre':
         $id_torneo = $RCV->id_torneo;
 
-        if (($result = Query($conn, "SELECT * FROM CalcioBalilla_Squadre WHERE id_torneo = $id_torneo", $return_obj))->num_rows) {
+        if (($result = Query("SELECT * FROM CalcioBalilla_Squadre WHERE id_torneo = $id_torneo"))->num_rows) {
             $return_obj->Data = array();
             while ($row = $result->fetch_array(MYSQLI_ASSOC)) $return_obj->Data[] = $row;
         } else $return_obj->Log[] = "Nella tabella selezionata non ci sono dati";
@@ -31,11 +31,11 @@ switch ($_POST["action"]) {
     case 'RequestTabellone':
         $id_torneo = $RCV->id_torneo;
 
-        if (($result = Query($conn, "SELECT * FROM CalcioBalilla_Tabellone WHERE id_torneo = $id_torneo", $return_obj))->num_rows) {
+        if (($result = Query("SELECT * FROM CalcioBalilla_Tabellone WHERE id_torneo = $id_torneo"))->num_rows) {
             $return_obj->Data = array();
             while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-                $row['nome_Squadra_1'] = Query($conn, "SELECT Nome_Squadra FROM CalcioBalilla_Squadre WHERE id_squadra ='" . $row['Squadra_1'] . "'", $return_obj)->fetch_array(MYSQLI_ASSOC)['Nome_Squadra'];
-                $row['nome_Squadra_2'] = Query($conn, "SELECT Nome_Squadra FROM CalcioBalilla_Squadre WHERE id_squadra ='" . $row['Squadra_2'] . "'", $return_obj)->fetch_array(MYSQLI_ASSOC)['Nome_Squadra'];
+                $row['nome_Squadra_1'] = Query("SELECT Nome_Squadra FROM CalcioBalilla_Squadre WHERE id_squadra ='" . $row['Squadra_1'] . "'")->fetch_array(MYSQLI_ASSOC)['Nome_Squadra'];
+                $row['nome_Squadra_2'] = Query("SELECT Nome_Squadra FROM CalcioBalilla_Squadre WHERE id_squadra ='" . $row['Squadra_2'] . "'")->fetch_array(MYSQLI_ASSOC)['Nome_Squadra'];
             }
         } else $return_obj->Log[] = "Nella tabella selezionata non ci sono dati";
 
@@ -55,28 +55,28 @@ switch ($_POST["action"]) {
                 $Capitano  = $line[1];
                 $Compagno  = $line[2];
 
-                Query($conn, "INSERT INTO CalcioBalilla_Squadre (id_torneo, Nome_Squadra, Capitano, Compagno) VALUES ('$id_torneo', '$Nome_Squadra', '$Capitano', '$Compagno')", $return_obj);
+                Query("INSERT INTO CalcioBalilla_Squadre (id_torneo, Nome_Squadra, Capitano, Compagno) VALUES ('$id_torneo', '$Nome_Squadra', '$Capitano', '$Compagno')");
             }
 
             fclose($csvFile);
-        } else die(returndata($return_obj, 1, 'Invalid_file'));
+        } else die(returndata(1, 'Invalid_file'));
         break;
 
     case 'CreateTorneo':
         $id_user = $RCV->id_user;
         $nome_torneo = $RCV->nome_torneo;
 
-        Query($conn, "INSERT INTO CalcioBalilla_Tornei (Creatore, nome_torneo) VALUES ('$id_user','$nome_torneo')", $return_obj);
+        Query("INSERT INTO CalcioBalilla_Tornei (Creatore, nome_torneo) VALUES ('$id_user','$nome_torneo')");
         break;
 
     case 'CreateTabellone':
         $id_torneo = $RCV->id_torneo;
 
-        Query($conn, "DELETE FROM CalcioBalilla_Tabellone WHERE id_torneo = $id_torneo", $return_obj);
+        Query("DELETE FROM CalcioBalilla_Tabellone WHERE id_torneo = $id_torneo");
 
         $i = 2;
         $n = 1;
-        if (($result = Query($conn, "SELECT * FROM CalcioBalilla_Squadre WHERE id_torneo = '$id_torneo' ORDER BY RAND()", $return_obj))->num_rows) {
+        if (($result = Query("SELECT * FROM CalcioBalilla_Squadre WHERE id_torneo = '$id_torneo' ORDER BY RAND()"))->num_rows) {
 
             while ($result->num_rows - 2 * $i > 0) {
                 $i *= 2;
@@ -86,14 +86,14 @@ switch ($_POST["action"]) {
             $n_qualifiche = ($result->num_rows) - $i;
             for ($j = 1; $j <= $n_qualifiche; $j++) {
                 $row = array($result->fetch_array(MYSQLI_ASSOC)['id_squadra'], $result->fetch_array(MYSQLI_ASSOC)['id_squadra']);
-                Query($conn, "INSERT INTO CalcioBalilla_Tabellone (id_torneo, Fase, Numero_Sfida, Squadra_1, Squadra_2) VALUES ('$id_torneo','Qualifiche','$j','$row[0]','$row[1]')", $return_obj);
+                Query("INSERT INTO CalcioBalilla_Tabellone (id_torneo, Fase, Numero_Sfida, Squadra_1, Squadra_2) VALUES ('$id_torneo','Qualifiche','$j','$row[0]','$row[1]')");
             }
 
             for ($m = 1; $m <= $n; $m++) {
                 $fase = ($fasi_torneo[$n - $m] ? $fasi_torneo[$n - $m] : "Fase" . $m);
                 for ($j = 1; $j <= ($result->num_rows - $n_qualifiche) / pow(2, $m); $j++) {
                     $row = array($result->fetch_array(MYSQLI_ASSOC)['id_squadra'], $result->fetch_array(MYSQLI_ASSOC)['id_squadra']);
-                    Query($conn, "INSERT INTO CalcioBalilla_Tabellone (id_torneo, Fase, Numero_Sfida, Squadra_1, Squadra_2) VALUES ('$id_torneo','$fase','$j'," . var_export($row[0], true) . "," . var_export($row[1], true) . ")", $return_obj);
+                    Query("INSERT INTO CalcioBalilla_Tabellone (id_torneo, Fase, Numero_Sfida, Squadra_1, Squadra_2) VALUES ('$id_torneo','$fase','$j'," . var_export($row[0], true) . "," . var_export($row[1], true) . ")");
                 }
             }
         }
@@ -108,9 +108,9 @@ switch ($_POST["action"]) {
         $num_partita = $_POST['num_partita'];
 
         $sql = "UPDATE CalcioBalilla_Tabellone SET Squadra_Vincitrice = '$winner', Punteggio = '$punteggio' WHERE id_Partita = '$id_partita'";
-        Query($conn, $sql, $return_obj);
+        Query($sql);
 
-        $fase = Query($conn, "SELECT Fase FROM CalcioBalilla_Tabellone WHERE id_Partita = '$id_partita'", $return_obj)->fetch_array(MYSQLI_ASSOC)['Fase'];
+        $fase = Query("SELECT Fase FROM CalcioBalilla_Tabellone WHERE id_Partita = '$id_partita'")->fetch_array(MYSQLI_ASSOC)['Fase'];
 
         $cont = ceil($num_partita / 2);
 
@@ -125,7 +125,7 @@ switch ($_POST["action"]) {
         $sql = "SELECT * FROM CalcioBalilla_Tabellone WHERE Fase = '$fase'";
 
 
-        if ($result = Query($conn, $sql, $return_obj)) {
+        if ($result = Query($sql)) {
             if ($result->num_rows) {
                 while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
 
@@ -135,7 +135,7 @@ switch ($_POST["action"]) {
                         } else {
                             $sql = "UPDATE CalcioBalilla_Tabellone SET Squadra_1 = '$winner' WHERE id_Partita = '$row[id_Partita]'";
                         }
-                        Query($conn, $sql, $return_obj);
+                        Query($sql);
                     }
 
                     // if ($row['Squadra_1'] == null) {
@@ -143,7 +143,7 @@ switch ($_POST["action"]) {
                     // }
                     // if ($cont == 0) {
                     //     $sql = "UPDATE CalcioBalilla_Tabellone SET Squadra_1 = '$winner' WHERE id_Partita = '$row[id_Partita]'";
-                    //     Query($conn, $sql, $return_obj);
+                    //     Query($sql);
                     //     break;
                     // }
                     // if ($row['Squadra_2'] == null) {
@@ -151,7 +151,7 @@ switch ($_POST["action"]) {
                     // }
                     // if ($cont == -1) {
                     //     $sql = "UPDATE CalcioBalilla_Tabellone SET Squadra_2 = '$winner' WHERE id_Partita = '$row[id_Partita]'";
-                    //     Query($conn, $sql, $return_obj);
+                    //     Query($sql);
                     //     break;
                     // }
                 }
@@ -164,4 +164,4 @@ switch ($_POST["action"]) {
 }
 
 $conn->close();
-returndata($return_obj, 0, "Connection with MySQL database closed");
+returndata(0, "Connection with MySQL database closed");

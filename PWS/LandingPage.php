@@ -1,6 +1,6 @@
 <?php
 
-include "setting.php";
+include "../setting.php";
 
 switch ($_GET['action']) {
 
@@ -8,8 +8,8 @@ switch ($_GET['action']) {
         if (isset($_GET["token"])) {
             $token = $_GET["token"];
 
-            if (Query($conn, "SELECT verified FROM PWS_Users WHERE (token, verified) = ('$token', 0)", $return_obj)->num_rows) {
-                Query($conn, "UPDATE PWS_Users SET verified=1 WHERE token='$token'", $return_obj);
+            if (Query("SELECT verified FROM PWS_Users WHERE (token, verified) = ('$token', 0)")->num_rows) {
+                Query("UPDATE PWS_Users SET verified=1 WHERE token='$token'");
                 echo ("Succesfully verified. Redirect to main Bocchio's WebSite...");
             } else {
                 echo ("You have already verified your email succesfully. Redirect to main Bocchio's WebSite...");
@@ -26,7 +26,7 @@ switch ($_GET['action']) {
         if (isset($_GET["token"])) {
             $token = $_GET["token"];
 
-            if ($id_user = Query($conn, "SELECT id_user FROM PWS_Users WHERE token='$token' limit 1", $return_obj)->fetch_array(MYSQLI_ASSOC)['id_user']) {
+            if ($id_user = Query("SELECT id_user FROM PWS_Users WHERE token='$token' limit 1")->fetch_array(MYSQLI_ASSOC)['id_user']) {
 
                 echo "<form action='' method='post'>
 <input type='text' name='password' placeholder='Nuova password' minlength='5' >
@@ -41,7 +41,7 @@ switch ($_GET['action']) {
                     $token = '';
                     for ($i = 0; $i < 15; $i++) $token .= $characters[rand(0, strlen($characters) - 1)];
 
-                    Query($conn, "UPDATE PWS_Users SET password='$password', token='$token' WHERE id_user='$id_user'", $return_obj);
+                    Query("UPDATE PWS_Users SET password='$password', token='$token' WHERE id_user='$id_user'");
 
                     echo "<br>Password modificata con successo!<br>Redirect to main site..";
                     header("refresh:4;url=https://bocchionuxt.netlify.app/");

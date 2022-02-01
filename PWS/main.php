@@ -9,81 +9,87 @@
 // }
 
 
-include "setting.php";
+include_once "../setting.php";
+
 if (isset($_POST['data'])) $RCV = json_decode($_POST['data']);
 
 
-include "UserAction.php";
-include "ForumAction.php";
+include_once "UserAction.php";
+include_once "ForumAction.php";
 
 switch ($_POST["action"]) {
 
     case 'GetAllData':
         $table = $RCV->table;
 
-        GetAllData($conn, $table, $return_obj);
+        GetAllData($table);
         break;
 
     case 'InteractionsUpdate':
-        $month = date("m");
-        $year = date("Y");
-        $result = Query($conn, "SELECT * FROM PWS_Interactions WHERE (month, year) IN (($month,$year))", $return_obj);
+        $date = (string) date("m_Y");
 
-        // If month-year row hasn't been created yet
-        if ($result->num_rows == 0) Query($conn, "INSERT INTO PWS_Interactions (month, year) VALUES ($month,$year)", $return_obj);
-        $keys = array_keys((array)$RCV);
-        $values = array_values((array)$RCV);
 
-        for ($i = 0; $i < count($keys); $i++) {
-            # code...
-            $url_ricevuto = $keys[$i];
-            if (substr($url_ricevuto, -1) != '/') $url_ricevuto .= '/';
-
-            $result = Query($conn, "SELECT id_page FROM PWS_Pages WHERE url='$url_ricevuto' limit 1", $return_obj);
-            $id_page = $result->fetch_array(MYSQLI_ASSOC)['id_page'];
-            $id_page_ = $id_page . '_';
-
-            // If page has never been registrer before on database
-            if ($result->num_rows == 0) {
-                // Create record in PWS_Pages table
-                Query($conn, "INSERT INTO PWS_Pages (url) VALUES ('$url_ricevuto')", $return_obj);
-
-                $result = Query($conn, "SELECT id_page FROM PWS_Pages WHERE url='$url_ricevuto' limit 1", $return_obj);
-                $id_page = $result->fetch_array(MYSQLI_ASSOC)['id_page'];
-                $id_page_ = $id_page . '_';
-
-                // Add column to PWS_Interactions
-                Query($conn, "ALTER TABLE PWS_Interactions ADD COLUMN $id_page_ INT DEFAULT 0", $return_obj);
+        $exist = false;
+        $result = Query("DESC PWS_interactions");
+        while ($name_field = $result->fetch_array(MYSQLI_ASSOC)['Field']) {
+            if ($name_field == $date) {
+                $exist = true;
+                break;
             }
-
-            Query($conn, $sql = "UPDATE PWS_Pages SET interactions=interactions+$values[$i] WHERE id_page=$id_page", $return_obj);
-            Query($conn, "UPDATE PWS_Interactions SET $id_page_=$id_page_+$values[$i] WHERE (month, year) IN (($month,$year))", $return_obj);
         }
 
+
+        if (!$exist) {
+            // Create column for current date
+            $return_obj->Log[] = "Add column for: $date";
+            Query("ALTER TABLE PWS_Interactions ADD COLUMN $date JSON DEFAULT '{\"IT\":0,\"EN\":0,\"JP\":0}'");
+        }
+
+
+        // $keys = array_keys((array) $RCV);
+        // $values = array_values((array) $RCV);
+
+        // for ($i = 0; $i < count($keys); $i++) {
+
+        // list($id_page, $lang, $url) =  GetIdLang($keys[$i]);
+        list($id_page, $lang, $url) =  GetIdLang($RCV);
+
+        if (!$id_page) {
+            // Articolo non ancora registrato sul database
+            $return_obj->Log[] = "Articolo non ancora registrato sul database";
+            Query("INSERT INTO PWS_Pages (name) VALUES ('$url')");
+            $id_page = Query("SELECT LAST_INSERT_ID() AS id_page")->fetch_array(MYSQLI_ASSOC)['id_page'];
+            Query("INSERT INTO PWS_Traduction (id_page, $lang) VALUES ($id_page, '$url')");
+            Query("INSERT INTO PWS_Interactions (id_page) VALUES ($id_page)");
+        }
+
+        $result = Query("SELECT $date, id FROM PWS_Interactions WHERE id_page = $id_page");
+
+        $row = $result->fetch_array(MYSQLI_ASSOC);
+        // $newobj = AddToObj($row[$date], $lang, $values[$i]);
+        $newobj = AddToObj($row[$date], $lang, 1);
+
+        Query("UPDATE PWS_Interactions SET $date = '$newobj' WHERE id = $row[id]");
+        // }
         break;
 
-    case 'GetAllFile':
-        $result = Query($conn, "SELECT attachment, url FROM PWS_Pages", $return_obj);
-        if ($result->num_rows)
-            while ($row = $result->fetch_array(MYSQLI_ASSOC)) $return_obj->Data->{$row['url']} = json_decode($row['attachment']);
-        else $return_obj->Log[] = "The table selected is empty";
-        break;
 
     case 'NavigationGetFiles':
-        $url = $RCV->url;
+        list($id_page, $lang, $url) =  GetIdLang($RCV->url);
 
-        $result = Query($conn, "SELECT attachment FROM PWS_Pages WHERE url='$url' limit 1", $return_obj);
-        if ($result->num_rows) $return_obj->Data = json_decode($result->fetch_array(MYSQLI_ASSOC)['attachment']);
-        else $return_obj->Data = null;
+        $result = Query("SELECT attachment FROM PWS_Pages WHERE id_page = $id_page");
 
+        $return_obj->Data = json_decode($result->fetch_array(MYSQLI_ASSOC)['attachment']);
         break;
 
 
     default:
-        // die(returndata($return_obj, 1, "No action selected"));
+        // $return_obj->Log[] = "No action selected";
+
+        // die(returndata(1, "No action selected"));
 
         break;
 }
 
 $conn->close();
-returndata($return_obj, 0, "Connection with MySQL database closed");
+returndata(0, "Connection with MySQL database closed");
