@@ -1,6 +1,6 @@
 <?php
 
-include "../PWS/setting.php";
+include "../BWS/setting.php";
 
 $sql = "CREATE TABLE IF NOT EXISTS CalcioBalilla_Tornei (
     id_torneo int NOT NULL AUTO_INCREMENT,
@@ -9,7 +9,7 @@ $sql = "CREATE TABLE IF NOT EXISTS CalcioBalilla_Tornei (
 
     PRIMARY KEY (id_torneo),
     UNIQUE (nome_torneo),
-    FOREIGN KEY (Creatore) REFERENCES PWS_Users(id_user) ON DELETE NO ACTION ON UPDATE CASCADE
+    FOREIGN KEY (Creatore) REFERENCES BWS_Users(id_user) ON DELETE NO ACTION ON UPDATE CASCADE
 
     ) ENGINE=InnoDB";
 

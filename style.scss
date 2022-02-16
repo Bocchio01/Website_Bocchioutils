@@ -1,14 +1,32 @@
 * {
     box-sizing: border-box;
-    text-align: center;
+}
+
+a {
+    color: black;
+    &:hover {
+        color: rgba(0, 0, 0, 0.5);
+    }
 }
 
 body {
     background-color: #f0f0f2;
     font-family: "Segoe UI";
-    header > h1,
+    header > div > h1,
     footer > h2 {
         margin-block: 15px;
+        text-align: center;
+    }
+    header > div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        column-gap: 20px;
+        > a > img {
+            margin: auto;
+            height: 50px;
+        }
     }
 
     main {
@@ -30,12 +48,13 @@ body {
             > input {
                 width: 100%;
                 border-radius: 0.5em;
-                background-color: rgba(76, 175, 80, 1);
+                background-color: #ff9800;
                 border: none;
                 color: white;
                 padding: 15px 32px;
                 text-align: center;
                 font-size: 20px;
+                margin-block: 15px;
                 cursor: pointer;
                 &:hover {
                     color: black;
@@ -51,6 +70,7 @@ body {
             display: flex;
             flex-wrap: wrap;
             justify-content: space-evenly;
+            align-items: flex-start;
             row-gap: 2em;
             column-gap: 2em;
             width: 100%;
@@ -70,6 +90,7 @@ body {
     .graph {
         padding: 2em;
         > h2 {
+            text-align: center;
             margin-block: 0px 20px;
         }
     }

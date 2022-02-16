@@ -11,11 +11,11 @@ function returndata(int $code = 0, string $log = null)
 
 function isData(array $value)
 {
-    for ($i = 0; $i < count($value); $i++) {
-        if (!isset($_POST[$value[$i]])) {
-            die(returndata(1, "Data not received -> " . $value[$i]));
-        }
-    }
+    // for ($i = 0; $i < count($value); $i++) {
+    //     if (!isset($_POST[$value[$i]])) {
+    //         die(returndata(1, "Data not received -> " . $value[$i]));
+    //     }
+    // }
 }
 
 function Query(string $sql)
@@ -39,28 +39,35 @@ function GetAllData($table)
 
 function GetIdLang($url)
 {
-    $lang = 'IT';
-    if (strlen($url) > 3) {
-        if (substr($url, -1) != '/') $url .= '/';
-        if ($url[3] == '/') $lang = strtoupper(substr($url, 1, 3));
+    $params = array();
+    foreach (['loading', 'standalone'] as $param) {
+        if (strpos($url, '?' . $param . '=true')) {
+            $params[$param] = true;
+            $url = str_replace('?' . $param . '=true', '', $url);
+        }
     }
 
-    $result = Query("SELECT id_page FROM PWS_Traduction WHERE $lang LIKE '$url'")->fetch_array(MYSQLI_ASSOC)['id_page'];
+    if (substr($url, -1) != '/') $url .= '/';
+    if (strlen($url) > 3 && $url[3] == '/') $lang = substr($url, 1, 2);
+    else $lang = 'en';
 
-    return [$result, $lang, $url];
+    $id_page = Query("SELECT id_page FROM BWS_Traduction WHERE $lang LIKE '$url'")->fetch_array(MYSQLI_ASSOC)['id_page'];
+
+    if (!$id_page) $id_page = 1;
+
+    return [$id_page, $lang, $url, $params];
 }
 
-function AddToObj($obj_string, $target, $value)
-{
-    $obj = json_decode($obj_string);
-    $obj->{$target} += $value;
-    $newobj = json_encode($obj);
-    return $newobj;
-}
+// function AddToObj($obj_string, $target, $value)
+// {
+//     $obj = json_decode($obj_string);
+//     $obj->{$target} += $value;
+//     $newobj = json_encode($obj);
+//     return $newobj;
+// }
 
 function CreateToken(int $lenght = 15)
 {
-
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $token = '';
     for ($i = 0; $i < $lenght; $i++) $token .= $characters[rand(0, strlen($characters) - 1)];
@@ -83,11 +90,21 @@ function ForumGetPost($url)
     global $return_obj;
     list($id_page, $lang, $url) =  GetIdLang($url);
 
-    $isForum = Query("SELECT forum FROM PWS_Pages WHERE id_page='$id_page' limit 1")->fetch_array(MYSQLI_ASSOC)['forum'];
+    $isForum = Query("SELECT forum FROM BWS_Pages WHERE id_page='$id_page' limit 1")->fetch_array(MYSQLI_ASSOC)['forum'];
     if ($isForum) {
         $return_obj->Data->isForum = 1;
 
-        $posts = Query("SELECT u.nickname, u.avatar, f.* FROM PWS_Users AS u JOIN PWS_Forum AS f WHERE u.id_user = f.id_user AND f.id_page=$id_page ORDER BY f.refer, f.id_post");
+        $posts = Query("SELECT u.nickname, u.avatar, f.* FROM BWS_Users AS u JOIN BWS_Forum AS f WHERE (u.id_user = f.id_user OR (f.id_user IS NULL AND u.id_user = 1)) AND f.id_page=$id_page ORDER BY f.refer, f.id_post");
         while ($row = $posts->fetch_array(MYSQLI_ASSOC)) $return_obj->Data->Posts[] = $row;
     } else $return_obj->Data->isForum = 0;
+}
+
+function ClearCookie()
+{
+    setcookie('token', "", [
+        'path' => "/",
+        'samesite' => 'None',
+        'secure' => 'Secure',
+        'httponly' => false,
+    ]);
 }
