@@ -9,8 +9,9 @@ switch ($_POST["action"]) {
         $font = (int) $RCV->preferences->font;
         $avatar = $RCV->preferences->avatar;
         $lang = $RCV->preferences->lang;
+        $newsletter = (int) $RCV->preferences->newsletter;
 
-        Query("UPDATE BWS_Users SET theme='$theme', color='$color', font=$font, avatar='$avatar', lang='$lang' WHERE id_user='$id_user'");
+        Query("UPDATE BWS_Users SET theme='$theme', color='$color', font=$font, avatar='$avatar', lang='$lang', newsletter=$newsletter WHERE id_user='$id_user'");
         if (strlen($nickname) > 0) Query("UPDATE BWS_Users SET nickname='$nickname' WHERE id_user='$id_user'");
         else die(returndata(1, "Nickname can't be null."));
 
@@ -32,7 +33,7 @@ switch ($_POST["action"]) {
 
         Query("INSERT INTO BWS_Users (nickname, email, password, lang, token, tmp) VALUES ('$nickname','$email','$password','$lang','$token','$tmp')");
 
-        $message = render('./' . $lang . '/template/UserSignup.php', array('nickname' => $nickname, 'tmp' => $tmp));
+        $message = render('./template/' . $lang . '/UserSignup.php', array('nickname' => $nickname, 'tmp' => $tmp));
 
         if (mail($email, $subject, $message, $headers)) $return_obj->Log[] = "An e-mail has just been sended to: $email";
         else die(returndata(1, "There was a problem while sending e-mail to: $email\r\nCheck the e-mail or try again later."));
@@ -68,6 +69,7 @@ switch ($_POST["action"]) {
                     $return_obj->Data->preferences->font = (int) $row['font'];
                     $return_obj->Data->preferences->avatar = $row['avatar'];
                     $return_obj->Data->preferences->lang = $row['lang'];
+                    $return_obj->Data->preferences->newsletter = (bool) $row['newsletter'];
 
                     Query("UPDATE BWS_Users SET last_login=NOW() WHERE id_user = '$row[id_user]'");
 

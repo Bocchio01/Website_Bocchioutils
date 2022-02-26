@@ -1,6 +1,6 @@
 <?php
 
-include "../php/setting.php";
+include "../php/_setting.php";
 
 $id_torneo = $_POST["id_torneo"];
 // $id_torneo = 2;
@@ -50,14 +50,14 @@ if ($result->num_rows) {
             $row = array();
             for ($k = 0; $k < 2; $k++) {
                 if (!($get = $result->fetch_array(MYSQLI_ASSOC)['Nome_Squadra']) == "") {
-                    echo $get." ";
+                    echo $get . " ";
                     $row[] = $get;
                 } else {
                     $row[] = NULL;
                 }
             }
-            echo print_r($row)."<br>";
-            $sql = "INSERT INTO CalcioBalilla_Tabellone (id_torneo, Fase, Numero_Sfida, Squadra_1, Squadra_2) VALUES ('$id_torneo','Fase_$m','$j',".var_export($row[0], true).",".var_export($row[1], true).")";
+            echo print_r($row) . "<br>";
+            $sql = "INSERT INTO CalcioBalilla_Tabellone (id_torneo, Fase, Numero_Sfida, Squadra_1, Squadra_2) VALUES ('$id_torneo','Fase_$m','$j'," . var_export($row[0], true) . "," . var_export($row[1], true) . ")";
             if (!$conn->query($sql)) {
                 $return_obj->MySQL_err[] = $conn->error;
                 die(returndata($return_obj));

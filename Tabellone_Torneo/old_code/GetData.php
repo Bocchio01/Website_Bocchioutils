@@ -1,6 +1,6 @@
 <?php
 
-include "../php/setting.php";
+include "../php/_setting.php";
 
 isData(["table"]);
 $table = $_POST["table"];

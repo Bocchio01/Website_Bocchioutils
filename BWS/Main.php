@@ -1,6 +1,6 @@
 <?php
 
-include_once "../setting.php";
+include_once "../_setting.php";
 
 if (isset($_POST['data'])) $RCV = json_decode($_POST['data']);
 

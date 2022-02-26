@@ -1,6 +1,6 @@
 <?php
 
-include "../BWS/setting.php";
+include "../BWS/_setting.php";
 if (isset($_POST['data'])) $RCV = json_decode($_POST['data']);
 
 

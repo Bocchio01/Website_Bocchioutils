@@ -1,6 +1,6 @@
 <?php
 
-include "../BWS/setting.php";
+include "../BWS/_setting.php";
 
 $sql = "CREATE TABLE IF NOT EXISTS CalcioBalilla_Tornei (
     id_torneo int NOT NULL AUTO_INCREMENT,

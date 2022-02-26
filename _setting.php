@@ -1,7 +1,7 @@
 <?php
 
-include_once "env.php";
-include_once "functions.php";
+include_once "_env.php";
+include_once "_functions.php";
 
 // Setting
 header('Access-Control-Allow-Origin: ' . HOST_URL);

@@ -5,7 +5,7 @@ switch ($_POST["action"]) {
 
     case 'ForumDeletePost':
         $id_post = $RCV->selected_post->id_post;
-        Query("DELETE FROM BWS_Forum WHERE id_post = $id_post ");
+        Query("DELETE FROM BWS_Forum WHERE id_post = $id_post OR refer = $id_post");
         ForumGetPost($RCV->url);
         break;
 

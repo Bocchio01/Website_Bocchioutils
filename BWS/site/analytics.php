@@ -1,6 +1,6 @@
 <?php
 
-include_once "../../setting.php";
+include_once "../../_setting.php";
 
 header('Content-Type: text/html; charset=utf-8');
 require_once '../../_lib/phplot-6.2.0/phplot.php';
@@ -36,60 +36,26 @@ function DefaultGraph($data, $type = 'linepoints')
     return $plot;
 }
 
-$color_list = array(
-    'SkyBlue',
-    'green',
-    'orange',
-    'blue',
-    'red',
-    'DarkGreen',
-    'purple',
-    'peru',
-    'cyan',
-    'salmon',
-    'SlateBlue',
-    'YellowGreen',
-    'magenta',
-    'aquamarine1',
-    'gold',
-    'violet'
-);
-
 $year = (int) date("Y");
-
-
 $month = (int) date("m") - 1;
 
-$list_of_date = array();
 $plots = array();
 extract($_GET);
 
-if (!empty($lingua)) {
-    $lang_ = array($lingua);
-} else {
-    $lang_ = $lang;
-}
 
-if (!empty($anno_partenza)) {
-    $start_year = $anno_partenza;
-} else {
-    $start_year = "2022";
-}
+$lang_ = empty($lingua) ? $lang : array($lingua);
+$start_year = empty($anno_partenza) ? "2022" : $anno_partenza;
 
-$first_point = array();
-$first_point[] = 'Start';
-foreach ($lang_ as $l => $val) $first_point[] = 0;
 
 // Dati generali
 $result = Query("SELECT id_page, CONCAT(name, ' - (' , type, ')') AS descr FROM BWS_Pages ORDER BY type");
 while ($row = $result->fetch_array(MYSQLI_ASSOC)) $data_pages[$row['descr']] = $row['id_page'];
 
 
+// Registrazioni al sito
 if (!empty($registrazioni)) {
-    // Registrazioni al sito
     foreach ($lang_ as $l => $val) $data[$val] = 0;
 
-    $example_data[] = $first_point;
 
     $current_year = $start_year;
     $ser = "'" . implode("','", $lang_) . "'";
@@ -121,9 +87,8 @@ if (!empty($registrazioni)) {
 
 
 
+// Andamento: Gorlu la stampante
 if (!empty($id_pagina)) {
-    // Andamento: Gorlu la stampante
-    $example_data[] = $first_point;
 
     $current_year = $start_year;
 
@@ -155,11 +120,9 @@ if (!empty($id_pagina)) {
 
 
 
+// Andamento: Mix / Articoli...
 if (!empty($tipo_pagina)) {
-    // Andamento: Mix / Articoli...
     $id_array = Query("SELECT GROUP_CONCAT(id_page) AS id_array FROM BWS_Pages WHERE type = '$tipo_pagina'")->fetch_array(MYSQLI_ASSOC)['id_array'];
-
-    $example_data[] = $first_point;
 
     $current_year = $start_year;
 
@@ -191,8 +154,8 @@ if (!empty($tipo_pagina)) {
 
 
 
+// Lingue
 if (!empty($lingue)) {
-    // Lingue
     $current_year = $start_year;
 
     while ($current_year <= $year) {
@@ -227,12 +190,8 @@ if (!empty($lingue)) {
 
 if (!empty($anni)) {
     // Andamento negli anni (tripla colona per le tre lingue e )
-
-
     // $data = array(array('current_year', 40, 5, 10, 3), array('Feb', 90, 8, 15, 4));
 
-
-    // $example_data[] = $first_point;
     $current_year = $start_year;
 
     while ($current_year <= $year) {
@@ -302,3 +261,189 @@ if (!empty($stat)) {
     $stats['Numero'][] = $row['s'];
     $stats['Numero'][] = $row['p'];
 }
+
+?>
+
+<!DOCTYPE HTML>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="author" content="Tommaso Bocchietti">
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bocchio's WebSite Analytics</title>
+    <style>
+        @import url("../../style.css");
+
+        form>div {
+            display: block;
+        }
+
+        form>div>div {
+            display: grid;
+        }
+
+        @media (max-width: 1000px) {
+
+            form>div {
+                display: flex;
+                align-items: baseline;
+                justify-content: space-evenly;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1><a href="./">Bocchio's WebSite Analytics</a></h1>
+            <a href="../en/"><img src="/_img/lang/it.png" alt="Bandiera IT"></a>
+        </div>
+        <hr>
+    </header>
+    <main>
+
+        <form method="GET">
+            <div class="card">
+
+                <div>
+                    <label for="stat">
+                        <input id="stat" name="stat" type="checkbox" value="1" <?php if (isset($stat)) : ?> checked <?php endif; ?>>
+                        Visualizza statistiche
+                    </label>
+
+                    <hr>
+
+                    <label for="registrazioni">
+                        <input id="registrazioni" name="registrazioni" type="checkbox" value="1" <?php if (isset($registrazioni)) : ?> checked <?php endif; ?>>
+                        Visualizza registrazioni
+                    </label>
+
+                    <hr>
+
+                    <label for="lingue">
+                        <input id="lingue" name="lingue" type="checkbox" value="1" <?php if (isset($lingue)) : ?> checked <?php endif; ?>>
+                        Visualizza lingue
+                    </label>
+
+                    <hr>
+
+                    <label for="anni">
+                        <input id="anni" name="anni" type="checkbox" value="1" <?php if (isset($anni)) : ?> checked <?php endif; ?>>
+                        Visualizza anni
+                    </label>
+
+                    <hr>
+
+                </div>
+
+                <div>
+                    <label for="id_pagina">Seleziona una pagina</label>
+                    <select id="id_pagina" name="id_pagina">
+                        <option></option>
+                        <?php foreach ($data_pages as $name => $id_page) : ?>
+                            <option value="<?php echo $id_page ?>" <?php if (isset($id_pagina) && $id_page == $id_pagina) : ?> selected="selected" <?php endif; ?>><?php echo $name ?></option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <hr>
+
+                    <label for="tipo_pagina">Seleziona una tipologia</label>
+                    <select id="tipo_pagina" name="tipo_pagina">
+                        <option></option>
+                        <?php foreach ($type_page as $type) : ?>
+                            <option value="<?php echo $type ?>" <?php if (isset($tipo_pagina) && $type == $tipo_pagina) : ?> selected="selected" <?php endif; ?>><?php echo $type ?></option>
+                        <?php endforeach; ?>
+
+                    </select>
+
+                    <hr>
+
+                    <label for="lingua">Seleziona una lingua</label>
+                    <select id="lingua" name="lingua">
+                        <option></option>
+                        <?php foreach ($lang as $l) : ?>
+                            <option value="<?php echo $l ?>" <?php if (isset($lingua) && $l == $lingua) : ?> selected="selected" <?php endif; ?>><?php echo $l ?></option>
+                        <?php endforeach; ?>
+
+                    </select>
+
+                    <hr>
+
+                    <label for="anno_partenza">Anno partenza</label>
+                    <select id="anno_partenza" name="anno_partenza">
+                        <option></option>
+                        <?php for ($i = 2022; $i <= $year; $i++) : ?>
+                            <option value="<?php echo $i ?>" <?php if (isset($anno_partenza) && $i == $anno_partenza) : ?> selected="selected" <?php endif; ?>><?php echo $i ?></option>
+                        <?php endfor; ?>
+
+                    </select>
+                </div>
+            </div>
+
+            <input type="submit" name="submit" value="Genera">
+        </form>
+
+        <hr class="spacer">
+
+        <div class="data">
+
+            <?php if (isset($stat)) : ?>
+                <div class="card number">
+
+
+                    <?php foreach ($stats as $s => $value) : ?>
+                        <div>
+                            <h2><?php echo $s ?></h2>
+
+                            <?php foreach ($stats[$s] as $sv => $svalue) : ?>
+                                <div><?php echo $svalue ?></div>
+                            <?php endforeach; ?>
+
+                        </div>
+
+                        <?php if ($s != array_key_last($stats)) : ?>
+                            <hr class="spacer">
+                        <?php endif; ?>
+
+                    <?php endforeach; ?>
+
+                    <!-- <hr class="spacer">
+
+                <div>
+                    <h2>Legenda colori</h2>
+                    <?php foreach ($lang_ as $l => $value) : ?>
+                        <div style="background-color: <?php echo $color_list[$l] ?>"><?php echo $value ?></div>
+                    <?php endforeach; ?>
+                </div> -->
+                </div>
+            <?php endif; ?>
+
+
+            <?php foreach ($plots as $plot => $value) : ?>
+                <div class="card graph">
+                    <h2><?php echo $plot ?></h2>
+                    <img src="<?php echo $value->EncodeImage() ?>" alt=<?php echo $plot ?>>
+                </div>
+            <?php endforeach; ?>
+
+        </div>
+
+    </main>
+
+
+    <footer>
+        <hr>
+        <h2 id="copyright"></h2>
+    </footer>
+
+</body>
+
+<script>
+    document.getElementById('copyright').innerText = "Tommaso Bocchietti @ " + new Date().getFullYear();
+</script>
+
+</html>

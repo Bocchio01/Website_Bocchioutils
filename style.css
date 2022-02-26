@@ -65,11 +65,11 @@ body main form {
 }
 
 body main form > div {
+  padding: 1em;
+  margin: 15px;
   font-size: 20px;
   display: -ms-grid;
   display: grid;
-  padding: 1em;
-  margin: 15px;
 }
 
 body main form > input {
@@ -119,7 +119,7 @@ body .card {
   background-color: #fdfdff;
 }
 
-body .card > hr {
+body .card hr {
   margin-block: 20px;
   margin-inline: 0.5em;
 }

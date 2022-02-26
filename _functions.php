@@ -51,7 +51,7 @@ function GetIdLang($url)
     if (strlen($url) > 3 && $url[3] == '/') $lang = substr($url, 1, 2);
     else $lang = 'en';
 
-    $id_page = Query("SELECT id_page FROM BWS_Traduction WHERE $lang LIKE '$url'")->fetch_array(MYSQLI_ASSOC)['id_page'];
+    $id_page = Query("SELECT id_page FROM BWS_Translations WHERE $lang LIKE '$url'")->fetch_array(MYSQLI_ASSOC)['id_page'];
 
     if (!$id_page) $id_page = 1;
 
@@ -78,6 +78,18 @@ function CreateToken(int $lenght = 15)
 function render($script, array $vars = array())
 {
     extract($vars);
+
+    $style = "<style>
+        h1 {
+            text-align: center;
+            font-size: 25px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 15px;
+        }
+    </style>";
 
     ob_start();
     include $script;
@@ -107,4 +119,28 @@ function ClearCookie()
         'secure' => 'Secure',
         'httponly' => false,
     ]);
+}
+
+function GetLangSubdomanin()
+{
+    global $lang;
+    // var_dump($_SERVER);
+    // _SERVER array(51) { 
+    //     ["HTTP_REFERER"]=> string(39) "http://it.localhost/BWS/it/database.php" 
+    //     ["REQUEST_URI"]=> string(8) "/BWS/it/"
+    //     ["SCRIPT_NAME"]=> string(17) "/BWS/it/index.php"
+    //     ["PHP_SELF"]=> string(17) "/BWS/it/index.php"
+    // }
+
+    $url_array = explode('.', $_SERVER['HTTP_HOST']);
+    $locale = array_shift($url_array);
+
+    if (!in_array($locale, $lang)) {
+        $locale = "en";
+        // $otherlocale = "it";
+    } else {
+        // $otherlocale = $lang[!array_search($locale, $lang)];
+    }
+
+    return $locale;
 }

@@ -1,4 +1,4 @@
 <?php
 
-header("Location: ./BWS/it/");
+header("Location: ./BWS/site/");
 exit();

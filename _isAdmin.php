@@ -1,7 +1,6 @@
 <?php
 
-include "../../setting.php";
-header('Content-Type: text/html; charset=utf-8');
+include "_setting.php";
 $login = 0;
 
 if (isset($_POST['submit'])) {
@@ -36,4 +35,21 @@ if (isset($_COOKIE['token'])) {
             'httponly' => false,
         ]);
     }
+}
+
+if (isset($_POST['api_key'])) {
+    $key = $_POST['api_key'];
+    if ($key == API_KEY) $login = 1;
+}
+
+if (isset($_GET['api_key'])) {
+    $key = $_GET['api_key'];
+    if ($key == API_KEY) $login = 1;
+}
+
+if (!$login) {
+    ClearCookie();
+    // echo "You can't access this page";
+    // header("refresh:1;url=/");
+    // exit;
 }

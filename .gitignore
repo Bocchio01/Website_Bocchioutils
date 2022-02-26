@@ -2,3 +2,4 @@
 /_lib*
 /_DB_export
 /_fonts*
+*_env.php

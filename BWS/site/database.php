@@ -1,11 +1,16 @@
 <?php
 
-require_once "../_utils/_database.php";
+require_once "../../_isAdmin.php";
+header('Content-Type: text/html; charset=utf-8');
+
+$locale = GetLangSubdomanin();
+
+$i18n = json_decode(file_get_contents("i18n.json"), true)[$locale]['database'];
 
 ?>
 
 <!DOCTYPE html>
-<html lang="it">
+<html lang=<?= $locale ?>>
 
 <head>
     <meta charset="UTF-8">
@@ -13,7 +18,7 @@ require_once "../_utils/_database.php";
     <meta name="author" content="Tommaso Bocchietti">
     <meta name="robots" content="noindex">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bocchio's WebSite Tables</title>
+    <title><?= $i18n['title'] ?></title>
     <style>
         @import url("../../style.css");
 
@@ -56,20 +61,20 @@ require_once "../_utils/_database.php";
 
     <header>
         <div>
-            <h1><a href="./">Bocchio's WebSite Tables</a></h1>
-            <a href="../en/"><img src="/_langflag/it.png" alt="Bandiera IT"></a>
+            <h1><a href="./"><?= $i18n['title'] ?></a></h1>
+            <!-- <a href="../en/"><img src="/_img/lang/it.png" alt="Bandiera IT"></a> -->
         </div>
         <hr>
     </header>
 
     <main>
 
-        <?php if ($login == 0) : ?>
+        <?php if ($login != 1) : ?>
 
             <div class="data">
                 <div class="card graph">
-                    <h2>Identificazione</h2>
-                    <p>Per accedere a questi dati bisogna essere autorizzati.</p>
+                    <h2><?= $i18n['h2'] ?></h2>
+                    <p><?= $i18n['p'] ?></p>
                     <form method="post">
                         <div>
                             <label for="email">Email</label>
@@ -77,28 +82,28 @@ require_once "../_utils/_database.php";
                             <label for="password">Password</label>
                             <input type="password" name="password" id="password">
                         </div>
-                        <input type="submit" name="submit" value="Invia">
+                        <input type="submit" name="submit" value="Submit">
                     </form>
                 </div>
             </div>
 
         <?php else :
 
-            $tables = array('BWS_Users', 'BWS_Pages', 'BWS_Forum', 'BWS_Stats', 'BWS_Traduction', 'BWS_Interactions');
+            $tables = array('BWS_Users', 'BWS_Pages', 'BWS_Forum', 'BWS_Stats', 'BWS_Translations', 'BWS_Interactions');
             foreach ($tables as $key => $table) {
 
                 $res = Query("SELECT * FROM $table");
-                echo "<table border='1'><h2>$table</h2><tr>";
+                echo "<h2>$table</h2><table border='1'><thead><tr>";
 
-                while ($fieldinfo = $res->fetch_field()) echo "<th>{$fieldinfo->name}</th>";
-                echo "</tr>\n";
+                while ($fieldinfo = $res->fetch_field()) echo "<th>$fieldinfo->name</th>";
+                echo "</tr></thead><tbody>";
 
                 while ($row = $res->fetch_array(MYSQLI_ASSOC)) {
                     echo "<tr>";
-                    foreach ($row as $cell) echo "<td>$cell</td>";
-                    echo "</tr>\n";
+                    foreach ($row as $cell) echo "<td>" . htmlentities($cell) . "</td>";
+                    echo "</tr>";
                 }
-                echo "</table>";
+                echo "</tbody></table>";
             }
 
         endif; ?>

@@ -1,5 +1,5 @@
 <?php
-include "../setting.php";
+include "../_setting.php";
 
 $sql = array();
 
@@ -29,6 +29,7 @@ $sql[] = "CREATE TABLE IF NOT EXISTS BWS_Users (
 	font INT(2) DEFAULT 0,
 	avatar VARCHAR(127) DEFAULT '/icon.png',
 	lang ENUM('it','en') DEFAULT NULL,
+	newsletter INT(2) DEFAULT 0,
 
     verified BOOLEAN DEFAULT 0,
     token VARCHAR(127) DEFAULT NULL,
@@ -70,8 +71,8 @@ $sql[] = "CREATE TABLE IF NOT EXISTS BWS_Forum (
     ENGINE=InnoDB";
 
 
-// BWS_Traduction table
-$sql[] = "CREATE TABLE IF NOT EXISTS BWS_Traduction (
+// BWS_Translations table
+$sql[] = "CREATE TABLE IF NOT EXISTS BWS_Translations (
     id INT(4) NOT NULL AUTO_INCREMENT,
     id_page INT(4) NOT NULL,
     en VARCHAR(127) DEFAULT NULL,
@@ -97,7 +98,7 @@ $sql[] = "CREATE TABLE IF NOT EXISTS BWS_Stats (
 
 
 $sql[] = "INSERT INTO BWS_Pages (name) VALUES ('Error page')";
-$sql[] = "INSERT INTO BWS_Traduction (id_page, it, en) VALUES (1, '/it/error_page/', '/error_page/')";
+$sql[] = "INSERT INTO BWS_Translations (id_page, it, en) VALUES (1, '/it/error_page/', '/error_page/')";
 $sql[] = "INSERT INTO BWS_Interactions (id_page) VALUES (1)";
 
 $sql[] = "INSERT INTO BWS_Users (nickname, email, password, lang) VALUES ('Anonimus','anonimus@no-reply.it','Null','it')";
