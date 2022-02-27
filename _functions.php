@@ -9,6 +9,7 @@ function returndata(int $code = 0, string $log = null)
     echo json_encode($return_obj);
 }
 
+
 function isData(array $value)
 {
     // for ($i = 0; $i < count($value); $i++) {
@@ -17,6 +18,7 @@ function isData(array $value)
     //     }
     // }
 }
+
 
 function Query(string $sql)
 {
@@ -28,6 +30,7 @@ function Query(string $sql)
     }
 }
 
+
 function GetAllData($table)
 {
     global $return_obj;
@@ -36,6 +39,7 @@ function GetAllData($table)
     if ($result->num_rows) while ($row = $result->fetch_array(MYSQLI_ASSOC)) $return_obj->Data[] = $row;
     else $return_obj->Log[] = "The table selected is empty";
 }
+
 
 function GetIdLang($url)
 {
@@ -58,13 +62,6 @@ function GetIdLang($url)
     return [$id_page, $lang, $url, $params];
 }
 
-// function AddToObj($obj_string, $target, $value)
-// {
-//     $obj = json_decode($obj_string);
-//     $obj->{$target} += $value;
-//     $newobj = json_encode($obj);
-//     return $newobj;
-// }
 
 function CreateToken(int $lenght = 15)
 {
@@ -75,21 +72,12 @@ function CreateToken(int $lenght = 15)
     return $token;
 }
 
+
 function render($script, array $vars = array())
 {
     extract($vars);
 
-    $style = "<style>
-        h1 {
-            text-align: center;
-            font-size: 25px;
-            margin-bottom: 20px;
-        }
-
-        p {
-            font-size: 15px;
-        }
-    </style>";
+    $style = file_get_contents(UTILS_SITE . '/BWS/template/style.css',);
 
     ob_start();
     include $script;
@@ -111,36 +99,36 @@ function ForumGetPost($url)
     } else $return_obj->Data->isForum = 0;
 }
 
-function ClearCookie()
+function Cookie($cookie_value)
 {
-    setcookie('token', "", [
-        'path' => "/",
+    setcookie('token', "$cookie_value", [
+        'expires' => time() + 60 * 60 * 24 * 30,
+        'path' => '/',
         'samesite' => 'None',
         'secure' => 'Secure',
         'httponly' => false,
     ]);
 }
 
-function GetLangSubdomanin()
+function ClearCookie()
+{
+    setcookie('token', '', [
+        'path' => '/',
+        'samesite' => 'None',
+        'secure' => 'Secure',
+        'httponly' => true,
+    ]);
+}
+
+function LoadTranslation()
 {
     global $lang;
-    // var_dump($_SERVER);
-    // _SERVER array(51) { 
-    //     ["HTTP_REFERER"]=> string(39) "http://it.localhost/BWS/it/database.php" 
-    //     ["REQUEST_URI"]=> string(8) "/BWS/it/"
-    //     ["SCRIPT_NAME"]=> string(17) "/BWS/it/index.php"
-    //     ["PHP_SELF"]=> string(17) "/BWS/it/index.php"
-    // }
+    $locale = "en";
 
-    $url_array = explode('.', $_SERVER['HTTP_HOST']);
-    $locale = array_shift($url_array);
+    if (isset($_GET['l']) && in_array($_GET['l'], $lang)) $locale = $_GET['l'];
+    $i18n = json_decode(file_get_contents("./i18n/" . $locale . ".json"), true);
 
-    if (!in_array($locale, $lang)) {
-        $locale = "en";
-        // $otherlocale = "it";
-    } else {
-        // $otherlocale = $lang[!array_search($locale, $lang)];
-    }
+    $notlocale = $lang[!array_search($locale, $lang)];
 
-    return $locale;
+    return [$i18n, $locale, $notlocale];
 }

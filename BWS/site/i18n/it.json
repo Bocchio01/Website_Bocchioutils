@@ -1,0 +1,104 @@
+{
+    "index": {
+        
+        "title": "Bocchio's WebSite Utilità",
+        "VerifyEmail": [
+            {
+                "h2": "Perfetto!",
+                "p": "Email verificata correttamente!",
+                "a": "Clicca qui per andare direttamente al sito principale ed usufruire delle funzionalità aggiuntive."
+            },
+            {
+                "h2": "Email già verificata!",
+                "a": "Clicca qui per andare direttamente al sito principale ed usufruire delle funzionalità aggiuntive."
+            },
+            {
+                "h2": "Errore...",
+                "p": "C'è stato un problema durante la verifica dell'email.",
+                "a": "Clicca qui per scrivere all'amministrazione del sito.",
+                "a_query": "subject=Verifica email non riuscita"
+            }
+        ],
+
+        "ForgotPassword": [
+            {
+                "h2": "Controlla la tua email!",
+                "p": "L'email con le istruzioni per il recupero credenziali è appena stata inviata a: "       
+            },
+            {
+                "h2": "Errore...",
+                "p": "C'è stato un problema durante l'invio dell'email all'indirizzo: ",
+                "a": "Riprova."
+            },
+            {
+                "h2": "Email inserita non corretta",
+                "a": "L'email inserita non è associata a nessun utente. Riprova."
+            },
+            {
+                "h2": "Password dimenticata",
+                "p": [
+                    "Per ragioni di sicurezza e privacy non possiamo fornirti direttamente la tua password.",
+                    "Inserisci la tua email nel campo di seguito e clicca su invia. Riceverai per email le istruzioni per reimpostare la tua password."
+                ],
+                "submit": "Invia"
+            }
+        ],
+
+        "ModifyPassword": [
+            {
+                "h2": "Password modificata!",
+                "p": "Il cambio password ha avuto esito positivo.",
+                "a": "Riaccedi al sito con la tua nuova password!"
+            },
+            {
+                "h2": "Errore...",
+                "a": "Controlla i dati inseriti."
+            },
+            {
+                "h2": "Modifica password",
+                "p": [
+                    "Inserisci qui la tua email e la tua vecchia password.",
+                    "Nel campo apposito inserisci la nuova password e poi clicca su invia."
+                ],
+                "form": [
+                    "Vecchia password",
+                    "Nuova password",
+                    "Invia"
+                ]
+            }
+        ],
+
+        "ModifyPasswordEmail": [
+            {
+                "h2": "Errore...",
+                "p": "La nuova passord deve essere lunga almeno 5 caratteri.",
+                "a": "Riprova."
+            },
+            {
+                "h2": "Modifica password",
+                "p": [
+                    "Inserisci qui la tua email e la password provvisoria ricevuta.",
+                    "Nel campo apposito inserisci la nuova password e poi clicca su invia."
+                ],
+                "form": [
+                    "Password provvisoria",
+                    "Nuova password",
+                    "Invia"
+                ]
+            }
+        ],
+
+        "default": [
+            "Password dimenticata",
+            "Modifica password",
+            "Analytics",
+            "Database"
+        ]
+    },
+
+    "database": {
+        "title": "Bocchio's WebSite Database",
+        "h2": "Identificazione",
+        "p": "Per accedere a questi dati bisogna essere autorizzati."
+    }
+}

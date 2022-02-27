@@ -3,9 +3,8 @@
 include "../../_setting.php";
 header('Content-Type: text/html; charset=utf-8');
 
-$locale = GetLangSubdomanin();
-
-$i18n = json_decode(file_get_contents("i18n.json"), true)[$locale]['index'];
+list($i18n, $locale, $notlocale) = LoadTranslation();
+$i18n = $i18n['index'];
 
 $action = -1;
 
@@ -115,8 +114,8 @@ unset($_POST);
 
     <header>
         <div>
-            <h1><a href="./"><?= $i18n['title'] ?></a></h1>
-            <!-- <a href="https://<?= UTILS_SITE ?>"><img src="/_img/lang/it.png" alt="Bandiera IT"></a> -->
+            <h1><a href="./?l=<?= $locale ?>"><?= $i18n['title'] ?></a></h1>
+            <a href="./?l=<?= $notlocale ?>"><img src="/_img/lang/<?= $notlocale ?>.png" alt="Bandiera <?= $notlocale ?>"></a>
         </div>
         <hr>
     </header>
@@ -161,11 +160,11 @@ unset($_POST);
                             case 1: ?>
                                 <h2><?= $i18n['ForgotPassword'][1]['h2'] ?></h2>
                                 <p><?= $i18n['ForgotPassword'][1]['p'] ?><?php echo $email ?></p>
-                                <a href=""><?= $i18n['ForgotPassword'][1]['a'] ?></a>
+                                <a href="?l=<?= $locale ?>"><?= $i18n['ForgotPassword'][1]['a'] ?></a>
                             <?php break;
                             case 2: ?>
                                 <h2><?= $i18n['ForgotPassword'][2]['h2'] ?></h2>
-                                <a href=""><?= $i18n['ForgotPassword'][2]['a'] ?></a>
+                                <a href="?l=<?= $locale ?>"><?= $i18n['ForgotPassword'][2]['a'] ?></a>
                             <?php break;
                             default: ?>
                                 <h2><?= $i18n['ForgotPassword'][3]['h2'] ?></h2>
@@ -191,7 +190,7 @@ unset($_POST);
                             <?php break;
                             case 1: ?>
                                 <h2><?= $i18n['ModifyPassword'][1]['h2'] ?></h2>
-                                <a href=""><?= $i18n['ModifyPassword'][1]['a'] ?></a>
+                                <a href="?l=<?= $locale ?>"><?= $i18n['ModifyPassword'][1]['a'] ?></a>
                             <?php break;
                             default: ?>
                                 <h2><?= $i18n['ModifyPassword'][2]['h2'] ?></h2>
@@ -221,12 +220,12 @@ unset($_POST);
                             <?php break;
                             case 1: ?>
                                 <h2><?= $i18n['ModifyPassword'][1]['h2'] ?></h2>
-                                <a href=""><?= $i18n['ModifyPassword'][1]['a'] ?></a>
+                                <a href="?l=<?= $locale ?>"><?= $i18n['ModifyPassword'][1]['a'] ?></a>
                             <?php break;
                             case 2: ?>
                                 <h2><?= $i18n['ModifyPasswordEmail'][0]['h2'] ?></h2>
                                 <p><?= $i18n['ModifyPasswordEmail'][0]['p'] ?></p>
-                                <a href=""><?= $i18n['ModifyPasswordEmail'][0]['a'] ?></a>
+                                <a href="?l=<?= $locale ?>"><?= $i18n['ModifyPasswordEmail'][0]['a'] ?></a>
                             <?php break;
                             default: ?>
                                 <h2><?= $i18n['ModifyPasswordEmail'][1]['h2'] ?></h2>
@@ -248,14 +247,14 @@ unset($_POST);
 
 
                     default: ?>
-                        <a href="?action=ForgotPassword">
+                        <a href="?l=<?= $locale ?>&action=ForgotPassword">
                             <div class="card graph">
                                 <h2><?= $i18n['default'][0] ?></h2>
                                 <img src="../../_img/index/ForgotPassword.svg" alt=<?= $i18n['default'][0] ?>>
                             </div>
                         </a>
 
-                        <a href="?action=ModifyPassword">
+                        <a href="?l=<?= $locale ?>&action=ModifyPassword">
                             <div class="card graph">
                                 <h2><?= $i18n['default'][1] ?></h2>
                                 <img src="../../_img/index/ModifyPassword.svg" alt=<?= $i18n['default'][1] ?>>
@@ -264,14 +263,14 @@ unset($_POST);
 
                         <hr style="width: 80%">
 
-                        <a href="analytics.php">
+                        <a href="analytics.php?l=<?= $locale ?>">
                             <div class="card graph">
                                 <h2><?= $i18n['default'][2] ?></h2>
                                 <img src="../../_img/index/Analytics.svg" alt=<?= $i18n['default'][2] ?>>
                             </div>
                         </a>
 
-                        <a href="database.php">
+                        <a href="database.php?l=<?= $locale ?>">
                             <div class="card graph">
                                 <h2><?= $i18n['default'][3] ?></h2>
                                 <img src="../../_img/index/Database.svg" alt=<?= $i18n['default'][3] ?>>

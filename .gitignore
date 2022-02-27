@@ -1,5 +1,5 @@
 *.zip
 /_lib*
-/_DB_export
+/_dumpDB
 /_fonts*
 *_env.php

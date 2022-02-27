@@ -1,0 +1,17 @@
+h1 {
+    text-align: center;
+    font-size: 27px;
+    margin-bottom: 20px;
+}
+p, li {
+    font-size: 15px;
+}
+
+@media (max-width: 400px) {
+    h1 {
+        font-size: 21px;
+    }
+    p, li {
+        font-size: 13px;
+    }
+}

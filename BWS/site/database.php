@@ -3,9 +3,8 @@
 require_once "../../_isAdmin.php";
 header('Content-Type: text/html; charset=utf-8');
 
-$locale = GetLangSubdomanin();
-
-$i18n = json_decode(file_get_contents("i18n.json"), true)[$locale]['database'];
+list($i18n, $locale, $notlocale) = LoadTranslation();
+$i18n = $i18n['database'];
 
 ?>
 
@@ -61,8 +60,8 @@ $i18n = json_decode(file_get_contents("i18n.json"), true)[$locale]['database'];
 
     <header>
         <div>
-            <h1><a href="./"><?= $i18n['title'] ?></a></h1>
-            <!-- <a href="../en/"><img src="/_img/lang/it.png" alt="Bandiera IT"></a> -->
+            <h1><a href="./?l=<?= $locale ?>"><?= $i18n['title'] ?></a></h1>
+            <a href="./?l=<?= $notlocale ?>"><img src="/_img/lang/<?= $notlocale ?>.png" alt="Bandiera <?= $notlocale ?>"></a>
         </div>
         <hr>
     </header>

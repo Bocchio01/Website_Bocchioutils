@@ -11,13 +11,7 @@ if (isset($_POST['submit'])) {
         $row = $result->fetch_array(MYSQLI_ASSOC);
         if ($row['id_user'] == 2) {
             $login = 1;
-            setcookie('token', "$row[token]", [
-                'expires' => time() + 60 * 60 * 24 * 30,
-                'path' => "/",
-                // 'samesite' => 'None',
-                'secure' => 'Secure',
-                'httponly' => false,
-            ]);
+            Cookie($row['token']);
         }
     }
 }
@@ -27,13 +21,7 @@ if (isset($_COOKIE['token'])) {
     $id_user = Query("SELECT id_user FROM BWS_Users WHERE token = '$token'")->fetch_array(MYSQLI_ASSOC)['id_user'];
     if ($id_user == 2) {
         $login = 1;
-        setcookie('token', "$token", [
-            'expires' => time() + 60 * 60 * 24 * 30,
-            'path' => "/",
-            // 'samesite' => 'None',
-            'secure' => 'Secure',
-            'httponly' => false,
-        ]);
+        Cookie($token);
     }
 }
 
@@ -49,7 +37,5 @@ if (isset($_GET['api_key'])) {
 
 if (!$login) {
     ClearCookie();
-    // echo "You can't access this page";
-    // header("refresh:1;url=/");
-    // exit;
+    error_log(date(DATE_RSS) . " -> Login non riuscito\n" . print_r($_SERVER, true) . "\n\n---------------------\n\n", 3, '/log.txt');
 }
