@@ -29,12 +29,12 @@ switch ($_POST["action"]) {
         }
 
         list($id_page, $lang, $url, $param) =  GetIdLang($RCV);
-        if ($url == '') break;
 
         if (isset($param['loading'])) Query("UPDATE BWS_Stats SET loading = loading+1 WHERE year = '$year'");
         if (isset($param['standalone'])) Query("UPDATE BWS_Stats SET standalone = standalone+1 WHERE year = '$year'");
-
         Query("UPDATE BWS_Stats SET total_pageview = total_pageview+1 WHERE year = '$year'");
+
+        if ($url == '') break;
 
         if (!Query("SELECT JSON_EXTRACT(`$year`, '$[$month].$lang') as is_null FROM BWS_Interactions WHERE id_page = $id_page")->fetch_array(MYSQLI_ASSOC)['is_null']) {
             Query("UPDATE BWS_Interactions SET `$year`=JSON_SET(`$year`, '$[$month].$lang', 1) WHERE id_page = $id_page");

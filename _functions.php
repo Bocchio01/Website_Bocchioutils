@@ -41,14 +41,14 @@ function GetAllData($table)
 }
 
 
-function GetIdLang($url)
+function GetIdLang($complete_url)
 {
+    $url = parse_url($complete_url, PHP_URL_PATH);
+    $query = parse_url($complete_url, PHP_URL_QUERY);
+
     $params = array();
     foreach (['loading', 'standalone'] as $param) {
-        if (strpos($url, '?' . $param . '=true')) {
-            $params[$param] = true;
-            $url = str_replace('?' . $param . '=true', '', $url);
-        }
+        if (strpos('?' . $query, $param)) $params[$param] = true;
     }
 
     if (substr($url, -1) != '/') $url .= '/';
