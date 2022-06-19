@@ -95,6 +95,10 @@ body {
         }
     }
 
+    .hover:hover {
+        transform: scale(1.03);
+    }
+
     .number {
         display: flex;
         flex-wrap: wrap;

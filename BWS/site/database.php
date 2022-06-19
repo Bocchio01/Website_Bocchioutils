@@ -63,6 +63,7 @@ $i18n = $i18n['database'];
             <h1><a href="./?l=<?= $locale ?>"><?= $i18n['title'] ?></a></h1>
             <a href="./?l=<?= $notlocale ?>"><img src="/_img/lang/<?= $notlocale ?>.png" alt="Bandiera <?= $notlocale ?>"></a>
         </div>
+        <p style="display: block; text-align:center; margin:0"><a href=<?php echo HOST_URL; ?>><?= $i18n['subtitle'] ?></a></p>
         <hr>
     </header>
 

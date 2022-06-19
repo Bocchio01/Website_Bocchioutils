@@ -4,7 +4,12 @@ include_once "_env.php";
 include_once "_functions.php";
 
 // Setting
-header('Access-Control-Allow-Origin: ' . HOST_URL);
+$http_origin = $_SERVER['HTTP_ORIGIN'];
+
+if ($http_origin == HOST_URL || $http_origin == "https://www.bocchio.dev" || $http_origin == "https://bocchio.netlify.app") {
+    header("Access-Control-Allow-Origin: $http_origin");
+}
+
 header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json; charset=utf-8');
 
@@ -25,7 +30,7 @@ $database = "my_bocchioutils";
 
 // Email variables
 $subject = "Bocchio's WebSite";
-$headers = "From: no-reply@bocchio.it\r\n";
+$headers = "From: no-reply@bocchio.dev\r\n";
 $headers .= "MIME-Version: 1.0\r\n";
 $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 

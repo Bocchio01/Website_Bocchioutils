@@ -4,7 +4,8 @@ include_once "../../_setting.php";
 require_once "../../_isAdmin.php";
 
 if ($login) {
-    $xml = file_get_contents(HOST_URL . "/sitemap.xml");
+    sleep(5);
+    $xml = file_get_contents(HOST_URL . "/sitemap.xml" . '?' . mt_rand());
 
     $document = new DOMDocument;
     $document->loadXML($xml);

@@ -302,6 +302,7 @@ if (!empty($stat)) {
             <h1><a href="./">Bocchio's WebSite Analytics</a></h1>
             <a href="../en/"><img src="/_img/lang/it.png" alt="Bandiera IT"></a>
         </div>
+        <p style="display: block; text-align:center; margin:0"><a href=<?php echo HOST_URL; ?>><?= $i18n['subtitle'] ?></a></p>
         <hr>
     </header>
     <main>

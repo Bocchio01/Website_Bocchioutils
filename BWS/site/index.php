@@ -117,6 +117,7 @@ unset($_POST);
             <h1><a href="./?l=<?= $locale ?>"><?= $i18n['title'] ?></a></h1>
             <a href="./?l=<?= $notlocale ?>"><img src="/_img/lang/<?= $notlocale ?>.png" alt="Bandiera <?= $notlocale ?>"></a>
         </div>
+        <p style="display: block; text-align:center; margin:0"><a href=<?php echo HOST_URL; ?>><?= $i18n['subtitle'] ?></a></p>
         <hr>
     </header>
 
@@ -146,7 +147,7 @@ unset($_POST);
                             case 2: ?>
                                 <h2><?= $i18n['VerifyEmail'][2]['h2'] ?></h2>
                                 <p><?= $i18n['VerifyEmail'][2]['p'] ?></p>
-                                <a href="mailto:tommaso.bocchietti@gmail.com?<?= $i18n['VerifyEmail'][2]['a_query'] ?>" rel="noopener noreferrer"><?= $i18n['VerifyEmail'][2]['a'] ?></a>
+                                <a href="mailto:webmaster@bocchio.dev?<?= $i18n['VerifyEmail'][2]['a_query'] ?>" rel="noopener noreferrer"><?= $i18n['VerifyEmail'][2]['a'] ?></a>
                             <?php endswitch;
                         break;
 
@@ -248,14 +249,14 @@ unset($_POST);
 
                     default: ?>
                         <a href="?l=<?= $locale ?>&action=ForgotPassword">
-                            <div class="card graph">
+                            <div class="card graph hover">
                                 <h2><?= $i18n['default'][0] ?></h2>
                                 <img src="../../_img/index/ForgotPassword.svg" alt=<?= $i18n['default'][0] ?>>
                             </div>
                         </a>
 
                         <a href="?l=<?= $locale ?>&action=ModifyPassword">
-                            <div class="card graph">
+                            <div class="card graph hover">
                                 <h2><?= $i18n['default'][1] ?></h2>
                                 <img src="../../_img/index/ModifyPassword.svg" alt=<?= $i18n['default'][1] ?>>
                             </div>
@@ -264,14 +265,14 @@ unset($_POST);
                         <hr style="width: 80%">
 
                         <a href="analytics.php?l=<?= $locale ?>">
-                            <div class="card graph">
+                            <div class="card graph hover">
                                 <h2><?= $i18n['default'][2] ?></h2>
                                 <img src="../../_img/index/Analytics.svg" alt=<?= $i18n['default'][2] ?>>
                             </div>
                         </a>
 
                         <a href="database.php?l=<?= $locale ?>">
-                            <div class="card graph">
+                            <div class="card graph hover">
                                 <h2><?= $i18n['default'][3] ?></h2>
                                 <img src="../../_img/index/Database.svg" alt=<?= $i18n['default'][3] ?>>
                             </div>

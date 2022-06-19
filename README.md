@@ -23,7 +23,7 @@ Links to the repositories:
 
 Links to sites:
 
-- [Main website](https://bocchio.netlify.app) (hosted on Netlify)
+- [Main website](https://bocchio.dev) (hosted on Netlify)
 - [Analytics/Database](https://bocchioutils.altervista.org) (hosted on Altervista)
 
 ## Explore

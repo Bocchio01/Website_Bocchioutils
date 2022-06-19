@@ -133,6 +133,11 @@ body .graph > h2 {
   margin-block: 0px 20px;
 }
 
+body .hover:hover {
+  -webkit-transform: scale(1.03);
+          transform: scale(1.03);
+}
+
 body .number {
   display: -webkit-box;
   display: -ms-flexbox;

@@ -1,8 +1,8 @@
 {
-
     "index": {
 
         "title": "Bocchio's WebSite Utils",
+        "subtitle": "Main site",
         "VerifyEmail": [
             {
                 "h2": "Perfect!",
@@ -16,7 +16,7 @@
             {
                 "h2": "Error...",
                 "p": "There was a problem while verifying the email.",
-                "a": "Click here to email the site administration.",
+                "a": "Click here to email the WebMaster.",
                 "a_query": "subject=Email verification failed"
             }
         ],
@@ -28,7 +28,7 @@
             },
             {
                 "h2": "Error...",
-                "p": "There was a problem while sending the email to the address: ",
+                "p": "There was a problem while sending the email to: ",
                 "a": "Please try again."
             },
             {
@@ -38,7 +38,7 @@
             {
                 "h2": "Forgot password",
                 "p": [
-                    "For security and privacy reasons, we cannot give you your password directly.",
+                    "For security and privacy reasons, we can't give you your password directly.",
                     "Enter your email in the field below and click submit. You will receive instructions on how to reset your password by email."
                 ],
                 "submit": "Submit"
@@ -49,7 +49,7 @@
             {
                 "h2": "Password changed!",
                 "p": "The password change was successful.",
-                "a": "Log back in to the site with your new password!"
+                "a": "Log back into the site with your new password!"
             },
             {
                 "h2": "Error...",
@@ -58,11 +58,11 @@
             {
                 "h2": "Change password",
                 "p": [
-                    "Enter your email and old password here.",
+                    "Enter your email and previous password here.",
                     "In the field provided, enter your new password and then click submit."
                 ],
                 "form": [
-                    "Old password",
+                    "Previous password",
                     "New password",
                     "Submit"
                 ]

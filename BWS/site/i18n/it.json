@@ -2,6 +2,7 @@
     "index": {
         
         "title": "Bocchio's WebSite Utilità",
+        "subtitle": "Sito principale",
         "VerifyEmail": [
             {
                 "h2": "Perfetto!",
@@ -15,7 +16,7 @@
             {
                 "h2": "Errore...",
                 "p": "C'è stato un problema durante la verifica dell'email.",
-                "a": "Clicca qui per scrivere all'amministrazione del sito.",
+                "a": "Clicca qui per scrivere al WebMaster.",
                 "a_query": "subject=Verifica email non riuscita"
             }
         ],
@@ -57,11 +58,11 @@
             {
                 "h2": "Modifica password",
                 "p": [
-                    "Inserisci qui la tua email e la tua vecchia password.",
+                    "Inserisci qui la tua email e la tua password precedente.",
                     "Nel campo apposito inserisci la nuova password e poi clicca su invia."
                 ],
                 "form": [
-                    "Vecchia password",
+                    "Precedente password",
                     "Nuova password",
                     "Invia"
                 ]

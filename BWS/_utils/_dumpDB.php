@@ -40,5 +40,5 @@ if ($login) {
 
     $message = render('../template/en/DumpDB.php', array('link' => $links[0]));
 
-    mail('tommaso.bocchietti@gmail.com', "Bocchio's WebSite - DB dump", $message, $headers);
+    mail('webmaster@bocchio.dev', "Bocchio's WebSite - DB dump", $message, $headers);
 }
