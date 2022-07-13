@@ -38,5 +38,5 @@ if (isset($_GET['api_key'])) {
 if (!$login) {
     ClearCookie();
     $h = error_log(date(DATE_RSS) . " -> Login non riuscito\n" . print_r($_SERVER, true) . "\n\n---------------------\n\n", 3, '../../log.txt');
-    // echo "Errore" . (int)$h;
+    echo "Login error!";
 }
