@@ -71,9 +71,10 @@ body {
             flex-wrap: wrap;
             justify-content: space-evenly;
             align-items: flex-start;
-            row-gap: 2em;
-            column-gap: 2em;
+            // row-gap: 1em;
+            // column-gap: 1em;
             width: 100%;
+            overflow: auto;
         }
     }
     .card {
@@ -81,6 +82,7 @@ body {
         margin: 15px;
         border-radius: 0.5em;
         background-color: #fdfdff;
+        padding: 2em;
         hr {
             margin-block: 20px;
             margin-inline: 0.5em;
@@ -95,26 +97,60 @@ body {
         }
     }
 
+    .graph-container {
+        display: flex;
+        text-align: center;
+        justify-content: space-between;
+        align-items: center;
+        overflow: auto;
+    }
+
     .hover:hover {
         transform: scale(1.03);
     }
 
-    .number {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        justify-content: space-evenly;
-        align-items: stretch;
-        width: 100%;
-        padding: 2em;
-        h2 {
-            margin-block: 0px 20px;
-        }
+    table {
+        border-collapse: collapse;
+        width: 90%;
+        margin: auto;
+    }
+
+    th,
+    td {
+        text-align: left;
+        padding: 8px;
+        white-space: nowrap;
+    }
+
+    th {
+        background-color: orange;
+        color: white;
+        text-transform: uppercase;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    tr:nth-child(even) {
+        background-color: white;
     }
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 800px) {
     main {
         flex-direction: column;
+        form {
+            > div.card {
+                display: flex !important;
+                overflow: auto;
+                justify-content: space-between;
+                column-gap: 2em;
+                > div {
+                    min-width: fit-content;
+                }
+            }
+        }
+    
     }
 }

@@ -1,12 +1,10 @@
 * {
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 a {
   color: black;
 }
-
 a:hover {
   color: rgba(0, 0, 0, 0.5);
 }
@@ -15,63 +13,40 @@ body {
   background-color: #f0f0f2;
   font-family: "Segoe UI";
 }
-
 body header > div > h1,
 body footer > h2 {
   margin-block: 15px;
   text-align: center;
 }
-
 body header > div {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-  -webkit-column-gap: 20px;
-          column-gap: 20px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  -moz-column-gap: 20px;
+       column-gap: 20px;
 }
-
 body header > div > a > img {
   margin: auto;
   height: 50px;
 }
-
 body main {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: start;
-      -ms-flex-align: start;
-          align-items: flex-start;
-  -ms-flex-preferred-size: initial;
-      flex-basis: initial;
-  -webkit-box-align: stretch;
-      -ms-flex-align: stretch;
-          align-items: stretch;
+  align-items: flex-start;
+  flex-basis: initial;
+  align-items: stretch;
 }
-
 body main form {
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
+  flex-shrink: 0;
   display: block;
   margin: 0px;
 }
-
 body main form > div {
   padding: 1em;
   margin: 15px;
   font-size: 20px;
-  display: -ms-grid;
   display: grid;
 }
-
 body main form > input {
   width: 100%;
   border-radius: 0.5em;
@@ -84,88 +59,85 @@ body main form > input {
   margin-block: 15px;
   cursor: pointer;
 }
-
 body main form > input:hover {
   color: black;
 }
-
 body main hr.spacer {
   margin-inline: 20px;
 }
-
 body main > div.data {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-  -webkit-box-pack: space-evenly;
-      -ms-flex-pack: space-evenly;
-          justify-content: space-evenly;
-  -webkit-box-align: start;
-      -ms-flex-align: start;
-          align-items: flex-start;
-  row-gap: 2em;
-  -webkit-column-gap: 2em;
-          column-gap: 2em;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: flex-start;
   width: 100%;
+  overflow: auto;
 }
-
 body .card {
-  -webkit-box-shadow: 2px 3px 7px 2px rgba(0, 0, 0, 0.4);
-          box-shadow: 2px 3px 7px 2px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 3px 7px 2px rgba(0, 0, 0, 0.4);
   margin: 15px;
   border-radius: 0.5em;
   background-color: #fdfdff;
+  padding: 2em;
 }
-
 body .card hr {
   margin-block: 20px;
   margin-inline: 0.5em;
 }
-
 body .graph {
   padding: 2em;
 }
-
 body .graph > h2 {
   text-align: center;
   margin-block: 0px 20px;
 }
-
-body .hover:hover {
-  -webkit-transform: scale(1.03);
-          transform: scale(1.03);
-}
-
-body .number {
-  display: -webkit-box;
-  display: -ms-flexbox;
+body .graph-container {
   display: flex;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-  -webkit-box-align: start;
-      -ms-flex-align: start;
-          align-items: flex-start;
-  -webkit-box-pack: space-evenly;
-      -ms-flex-pack: space-evenly;
-          justify-content: space-evenly;
-  -webkit-box-align: stretch;
-      -ms-flex-align: stretch;
-          align-items: stretch;
-  width: 100%;
-  padding: 2em;
+  text-align: center;
+  justify-content: space-between;
+  align-items: center;
+  overflow: auto;
+}
+body .hover:hover {
+  transform: scale(1.03);
+}
+body table {
+  border-collapse: collapse;
+  width: 90%;
+  margin: auto;
+}
+body th,
+body td {
+  text-align: left;
+  padding: 8px;
+  white-space: nowrap;
+}
+body th {
+  background-color: orange;
+  color: white;
+  text-transform: uppercase;
+}
+body tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+body tr:nth-child(even) {
+  background-color: white;
 }
 
-body .number h2 {
-  margin-block: 0px 20px;
-}
-
-@media (max-width: 1000px) {
+@media (max-width: 800px) {
   main {
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column;
+    flex-direction: column;
+  }
+  main form > div.card {
+    display: flex !important;
+    overflow: auto;
+    justify-content: space-between;
+    -moz-column-gap: 2em;
+         column-gap: 2em;
+  }
+  main form > div.card > div {
+    min-width: -webkit-fit-content;
+    min-width: -moz-fit-content;
+    min-width: fit-content;
   }
 }

@@ -1,15 +1,17 @@
 <?php
 
 include_once "../../_setting.php";
-
 header('Content-Type: text/html; charset=utf-8');
+list($i18n, $locale, $notlocale) = LoadTranslation();
+$i18n = $i18n['analytics'];
+
 require_once '../../_lib/phplot-6.2.0/phplot.php';
 
 
 function DefaultGraph($data, $type = 'linepoints')
 {
-    global $lang_;
-    $plot = new PHPlot();
+    global $langArray, $width, $height;
+    $plot = new PHPlot($width, $height);
 
     $plot->SetFailureImage(False);
     $plot->SetPrintImage(False);
@@ -31,235 +33,239 @@ function DefaultGraph($data, $type = 'linepoints')
     $plot->SetLineWidths(3);
     // $plot->SetYTickIncrement(1);
 
-    $plot->SetLegend($lang_);
+    $plot->SetLegend($langArray);
 
     return $plot;
 }
 
-$year = (int) date("Y");
-$month = (int) date("m") - 1;
 
-$plots = array();
+function graphAndData(String $query)
+{
+
+    global $langArray, $startYear, $currentYear, $currentMonth;
+
+    $idArray = Query($query)->fetch_array(MYSQLI_ASSOC)['idArray'];
+
+    for ($i = $startYear; $i <= $currentYear; $i++) {
+        if ($i == $currentYear) $nMonth = $currentMonth;
+        else $nMonth = 12;
+
+        for ($j = 0; $j <= $nMonth; $j++) {
+
+            $sql = array();
+            foreach ($langArray as $langNumber => $langName) $sql[] = "SUM(JSON_EXTRACT(`$i`, '$[$j].$langName')) AS $langName";
+            $row = Query("SELECT " . implode(', ', $sql) . " FROM BWS_Interactions WHERE id_page IN ($idArray)")->fetch_array(MYSQLI_ASSOC);
+            foreach ($row as $key => $value) $row[$key] = ($value == null) ? 0 : $value;
+
+            $set = array();
+            $set[] = $j + 1 . '-' . $i;
+            foreach ($langArray as $langNumber => $langName) $set[] = $row[$langName];
+            $example_data[] = $set;
+        }
+    }
+
+    return $example_data;
+}
+
+
+
+$currentYear = (int) date("Y");
+$currentMonth = (int) date("m") - 1;
+
+$graphAndData = array();
+$graphOnly = array();
+$dataOnly = array();
+
+
 extract($_GET);
 
+$langArray = empty($lingua) ? $lang : array($lingua);
+$width = empty($width) ? 600 : $width;
+$height = $width * 4 / 6;
 
-$lang_ = empty($lingua) ? $lang : array($lingua);
-$start_year = empty($anno_partenza) ? "2022" : $anno_partenza;
+$startYear = empty($startYear) ? "2022" : $startYear;
 
 
 // Dati generali
-$result = Query("SELECT id_page, CONCAT(name, ' - (' , type, ')') AS descr FROM BWS_Pages ORDER BY type");
-while ($row = $result->fetch_array(MYSQLI_ASSOC)) $data_pages[$row['descr']] = $row['id_page'];
+$result = Query("SELECT id_page, CONCAT(name, ' - (' , type, ')') AS label FROM BWS_Pages ORDER BY type, last_modify");
+while ($row = $result->fetch_array(MYSQLI_ASSOC)) $labelPages[$row['label']] = $row['id_page'];
 
 
-// Registrazioni al sito
-if (!empty($registrazioni)) {
-    foreach ($lang_ as $l => $val) $data[$val] = 0;
 
+if (!empty($stat)) {
+    // Andamento generale del sito
+    $result = Query("SELECT type, COUNT(id_page) as num FROM BWS_Pages GROUP BY type");
+    while ($row = $result->fetch_array(MYSQLI_ASSOC)) $dataz[$row['type']] = $row['num'];
 
-    $current_year = $start_year;
-    $ser = "'" . implode("','", $lang_) . "'";
+    $row = Query("SELECT COUNT(id_page) as num FROM BWS_Forum")->fetch_array(MYSQLI_ASSOC);
+    $dataz['Forum'] = $row['num'];
 
-    while ($current_year <= $year) {
-        if ($current_year == $year) $num = $month;
-        else $num = 12;
+    $dataOnly[] = $dataz;
 
-        for ($i = 0; $i <= $num; $i++) {
+    $example_data = graphAndData("SELECT GROUP_CONCAT(id_page) AS idArray FROM BWS_Pages WHERE id_page != 11");
+    $data['graph'] = DefaultGraph($example_data);
+    $data['graph']->SetYTitle('Numero visite per mese');
+    $data['graph']->DrawGraph();
 
-            $result = Query("SELECT COUNT(id_user) AS num, lang FROM BWS_Users WHERE lang IN ($ser) AND DATE_FORMAT(creation_date, '%m-%Y') = '" . sprintf('%02s-%s', $i + 1, $current_year) . "' GROUP BY lang ORDER BY creation_date");
-            while ($row = $result->fetch_array(MYSQLI_ASSOC)) $data[$row['lang']] += $row['num'];
+    $data['title'] = 'Andamento generale del sito';
 
-            $set = array();
-            $set[] = $i + 1 . '-' . $current_year;
-            foreach ($lang_ as $l => $val) $set[] = $data[$val];
-            $example_data[] = $set;
-        }
-
-        $current_year += 1;
+    $lastTwoMonths = array_slice($example_data, -2, 2);
+    foreach ($langArray as $langNumber => $langName) {
+        $data['current'][$langName] = $lastTwoMonths[1][$langNumber + 1];
+        $data['prev'][$langName] = $lastTwoMonths[0][$langNumber + 1];
+        $data['total'][$langName] = array_sum(array_column($example_data, $langNumber + 1));
     }
 
-
-    $plots['Registrazioni al sito'] = DefaultGraph($example_data);
-    end($plots)->SetYTitle('Attualmente registrati');
-    end($plots)->DrawGraph();
     $example_data = null;
+    $graphAndData[] = $data;
 }
-
 
 
 // Andamento: Gorlu la stampante
 if (!empty($id_pagina)) {
 
-    $current_year = $start_year;
+    $example_data = graphAndData("SELECT GROUP_CONCAT(id_page) AS idArray FROM BWS_Pages WHERE id_page = $id_pagina");
 
-    while ($current_year <= $year) {
-        if ($current_year == $year) $num = $month;
-        else $num = 12;
+    $data['graph'] = DefaultGraph($example_data);
+    $data['graph']->SetYTitle('Numero visite per mese');
+    $data['graph']->DrawGraph();
 
-        for ($i = 0; $i <= $num; $i++) {
+    $data['title'] = array_search($id_pagina, $labelPages);
 
-            $sql = array();
-            foreach ($lang_ as $l => $val) $sql[] = "SUM(JSON_EXTRACT(`$current_year`, '$[$i].$val')) AS $val";
-            $row = Query("SELECT " . implode(', ', $sql) . " FROM BWS_Interactions WHERE id_page = $id_pagina")->fetch_array(MYSQLI_ASSOC);
-            foreach ($row as $key => $value) $row[$key] = ($value == null) ? 0 : $value;
-
-            $set = array();
-            $set[] = $i + 1 . '-' . $current_year;
-            foreach ($lang_ as $l => $val) $set[] = $row[$val];
-            $example_data[] = $set;
-        }
-
-        $current_year += 1;
+    $lastTwoMonths = array_slice($example_data, -2, 2);
+    foreach ($langArray as $langNumber => $langName) {
+        $data['current'][$langName] = $lastTwoMonths[1][$langNumber + 1];
+        $data['prev'][$langName] = $lastTwoMonths[0][$langNumber + 1];
+        $data['total'][$langName] = array_sum(array_column($example_data, $langNumber + 1));
     }
 
-    $plots['Andamento: ' . array_search($id_pagina, $data_pages)] = DefaultGraph($example_data);
-    end($plots)->SetYTitle('Numero visite per mese');
-    end($plots)->DrawGraph();
     $example_data = null;
+    $graphAndData[] = $data;
 }
-
 
 
 // Andamento: Mix / Articoli...
 if (!empty($tipo_pagina)) {
-    $id_array = Query("SELECT GROUP_CONCAT(id_page) AS id_array FROM BWS_Pages WHERE type = '$tipo_pagina'")->fetch_array(MYSQLI_ASSOC)['id_array'];
 
-    $current_year = $start_year;
+    $example_data = graphAndData("SELECT GROUP_CONCAT(id_page) AS idArray FROM BWS_Pages WHERE type = '$tipo_pagina' AND id_page != 11");
 
-    while ($current_year <= $year) {
-        if ($current_year == $year) $num = $month;
-        else $num = 12;
+    $data['graph'] = DefaultGraph($example_data);
+    $data['graph']->SetYTitle('Numero visite per mese');
+    $data['graph']->DrawGraph();
 
-        for ($i = 0; $i <= $num; $i++) {
+    $data['title'] = $tipo_pagina;
 
-            $sql = array();
-            foreach ($lang_ as $l => $val) $sql[] = "SUM(JSON_EXTRACT(`$current_year`, '$[$i].$val')) AS $val";
-            $row = Query("SELECT " . implode(', ', $sql) . " FROM BWS_Interactions WHERE id_page IN ($id_array)")->fetch_array(MYSQLI_ASSOC);
-            foreach ($row as $key => $value) $row[$key] = ($value == null) ? 0 : $value;
-
-            $set = array();
-            $set[] = $i + 1 . '-' . $current_year;
-            foreach ($lang_ as $l => $val) $set[] = $row[$val];
-            $example_data[] = $set;
-        }
-
-        $current_year += 1;
+    $lastTwoMonths = array_slice($example_data, -2, 2);
+    foreach ($langArray as $langNumber => $langName) {
+        $data['current'][$langName] = $lastTwoMonths[1][$langNumber + 1];
+        $data['prev'][$langName] = $lastTwoMonths[0][$langNumber + 1];
+        $data['total'][$langName] = array_sum(array_column($example_data, $langNumber + 1));
     }
 
-    $plots['Andamento: ' . $tipo_pagina] = DefaultGraph($example_data);
-    end($plots)->SetYTitle('Numero visite per mese');
-    end($plots)->DrawGraph();
     $example_data = null;
+    $graphAndData[] = $data;
 }
 
 
 
-// Lingue
-if (!empty($lingue)) {
-    $current_year = $start_year;
+// Registrazioni al sito
+if (!empty($registrazioni)) {
+    foreach ($langArray as $langNumber => $langName) $data[$langName] = 0;
 
-    while ($current_year <= $year) {
-        if ($current_year == $year) $num = $month;
-        else $num = 12;
+    $ser = "'" . implode("','", $langArray) . "'";
 
-        for ($i = 0; $i <= $num; $i++) {
+    for ($i = $startYear; $i <= $currentYear; $i++) {
 
-            $sql = array();
-            foreach ($lang_ as $l => $val) $sql[] = "SUM(JSON_EXTRACT(`$current_year`, '$[$i].$val')) AS $val";
-            $row = Query("SELECT " . implode(', ', $sql) . " FROM BWS_Interactions")->fetch_array(MYSQLI_ASSOC);
-            foreach ($row as $key => $value) $row[$key] = ($value == null) ? 0 : $value;
+        if ($i == $currentYear) $nMonth = $currentMonth;
+        else $nMonth = 12;
+
+        for ($j = 0; $j <= $nMonth; $j++) {
+
+            $result = Query("SELECT COUNT(id_user) AS num, lang FROM BWS_Users WHERE lang IN ($ser) AND DATE_FORMAT(creation_date, '%m-%Y') = '" . sprintf('%02s-%s', $j + 1, $i) . "' GROUP BY lang ORDER BY creation_date");
+            while ($row = $result->fetch_array(MYSQLI_ASSOC)) $data[$row['lang']] += $row['num'];
 
             $set = array();
-            $set[] = $i + 1 . '-' . $current_year;
-            foreach ($lang_ as $l => $val) $set[] = $row[$val];
+            $set[] = $j + 1 . '-' . $i;
+            foreach ($langArray as $langNumber => $langName) $set[] = $data[$langName];
             $example_data[] = $set;
         }
-
-        $current_year += 1;
     }
 
+    $data['graph'] = DefaultGraph($example_data);
+    $data['graph']->SetYTitle('Attualmente registrati');
+    $data['graph']->DrawGraph();
 
-    $plots['Lingue (sul numero visualizzazioni)'] = DefaultGraph($example_data, 'pie');
-    end($plots)->SetDataType('text-data');
+    $data['title'] = 'Registrazioni al sito';
 
-    end($plots)->DrawGraph();
     $example_data = null;
+    $graphOnly[] = $data;
+}
+
+
+// Lingue
+if (!empty($lingue)) {
+
+    $example_data = graphAndData("SELECT GROUP_CONCAT(id_page) AS idArray FROM BWS_Pages WHERE id_page != 11");
+
+    $data['graph'] = DefaultGraph($example_data,  'pie');
+    $data['graph']->SetDataType('text-data');
+    $data['graph']->DrawGraph();
+
+    $data['title'] = 'Lingue';
+
+    $example_data = null;
+    $graphOnly[] = $data;
 }
 
 
 
 if (!empty($anni)) {
     // Andamento negli anni (tripla colona per le tre lingue e )
-    // $data = array(array('current_year', 40, 5, 10, 3), array('Feb', 90, 8, 15, 4));
+    // $datat = array(array('currentYear', 40, 5, 10, 3), array('Feb', 90, 8, 15, 4));
 
-    $current_year = $start_year;
 
-    while ($current_year <= $year) {
-        $result = Query("SELECT GROUP_CONCAT(id_page) AS id_array, type FROM BWS_Pages WHERE type != 'Non definito' GROUP BY type");
+    for ($i = $startYear; $i <= $currentYear; $i++) {
+        $result = Query("SELECT GROUP_CONCAT(id_page) AS idArray, type FROM BWS_Pages WHERE type != 'Non definito' AND id_page != 11 GROUP BY type");
         $set = array();
         $example_data = array();
         while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-            $id_array = $row['id_array'];
+            $idArray = $row['idArray'];
             $type = $row['type'];
 
 
-            if ($current_year == $year) $num = $month;
-            else $num = 12;
+            if ($i == $currentYear) $nMonth = $currentMonth;
+
+            else $nMonth = 12;
             $set[$type] = 0;
-            $data = 0;
-            for ($i = 0; $i <= $num; $i++) {
+            $datat = 0;
+            for ($j = 0; $j <= $nMonth; $j++) {
 
                 $sql = array();
-                foreach ($lang_ as $l => $val) $sql[] = "SUM(JSON_EXTRACT(`$current_year`, '$[$i].$val')) AS $val";
-                $row = Query("SELECT " . implode(', ', $sql) . " FROM BWS_Interactions WHERE id_page IN ($id_array)")->fetch_array(MYSQLI_ASSOC);
-                foreach ($row as $key => $value) $data += $row[$key];
+                foreach ($langArray as $langNumber => $langName) $sql[] = "SUM(JSON_EXTRACT(`$i`, '$[$j].$langName')) AS $langName";
+                $row = Query("SELECT " . implode(', ', $sql) . " FROM BWS_Interactions WHERE id_page IN ($idArray)")->fetch_array(MYSQLI_ASSOC);
+                foreach ($row as $key => $value) $datat += $row[$key];
             }
-            $set[$type] = $data;
+            $set[$type] = $datat;
         }
 
-        $example_data[] = $current_year;
-        foreach ($set as $s => $val) $example_data[] = $val;
+        $example_data[] = $i;
+        foreach ($set as $s => $langName) $example_data[] = $langName;
 
         $final_data[] = $example_data;
-        $current_year += 1;
     }
 
-    // $var = Query("SELECT JSON_MERGE(`Index`, Articolo, Portale, Mix ) AS js FROM BWS_Stats WHERE year = 2022")->fetch_array(MYSQLI_ASSOC)['js'];
-    // Query("UPDATE BWS_Stats SET total_pageview='$var' WHERE year = 2022");
+    $data['graph'] = DefaultGraph($final_data, 'stackedbars');
+    $data['graph']->SetLegendReverse(True);
+    $data['graph']->SetYDataLabelPos('plotstack');
+    foreach ($set as $s => $langName) $lgd[] = $s;
+    $data['graph']->SetLegend($lgd);
+    $data['graph']->SetYTitle('Tipologie negli anni');
+    $data['graph']->DrawGraph();
 
-    $plots['Andamento negli anni'] = DefaultGraph($final_data, 'stackedbars');
-    end($plots)->SetLegendReverse(True);
-    end($plots)->SetYDataLabelPos('plotstack');
-    foreach ($set as $s => $val) $lgd[] = $s;
+    $data['title'] = 'Andamento negli anni';
 
-    end($plots)->SetLegend($lgd);
-    end($plots)->SetYTitle('Tipologie negli anni');
-    end($plots)->DrawGraph();
     $example_data = null;
-}
-
-
-// Stats
-
-// Visitatori unici (in base al login / loading)
-// Andamento rispetto al mese precedente
-
-// $stats = array('visitatori_unici' => X, 'percentuale' => Z%)
-if (!empty($stat)) {
-
-    $stats = array();
-    $current_year = 2022;
-
-    $result = Query("SELECT CONCAT(type ,': ', COUNT(id_page)) as num FROM BWS_Pages GROUP BY type");
-    while ($row = $result->fetch_array(MYSQLI_ASSOC)) $stats['Statistiche generali'][] = $row['num'];
-
-    $row = Query("SELECT CONCAT('Forum: ', COUNT(id_page)) as num FROM BWS_Forum")->fetch_array(MYSQLI_ASSOC);
-    $stats['Statistiche generali'][] = $row['num'];
-
-    $row = Query("SELECT CONCAT('Loading: ', loading) as l, CONCAT('Standalone: ', standalone) as s, CONCAT('Page view: ', total_pageview) as p FROM BWS_Stats WHERE year = '$year'")->fetch_array(MYSQLI_ASSOC);
-    $stats['Numero'][] = $row['l'];
-    $stats['Numero'][] = $row['s'];
-    $stats['Numero'][] = $row['p'];
+    $graphOnly[] = $data;
 }
 
 ?>
@@ -293,14 +299,18 @@ if (!empty($stat)) {
                 justify-content: space-evenly;
             }
         }
+
+        td:not(:first-child) {
+            text-align: center;
+        }
     </style>
 </head>
 
 <body>
     <header>
         <div>
-            <h1><a href="./">Bocchio's WebSite Analytics</a></h1>
-            <a href="../en/"><img src="/_img/lang/it.png" alt="Bandiera IT"></a>
+            <h1><a href="./?l=<?= $locale ?>"><?= $i18n['title'] ?></a></h1>
+            <a href="./?l=<?= $notlocale ?>"><img src="/_img/lang/<?= $notlocale ?>.png" alt="Bandiera <?= $notlocale ?>"></a>
         </div>
         <p style="display: block; text-align:center; margin:0"><a href=<?php echo HOST_URL; ?>><?= $i18n['subtitle'] ?></a></p>
         <hr>
@@ -313,28 +323,28 @@ if (!empty($stat)) {
                 <div>
                     <label for="stat">
                         <input id="stat" name="stat" type="checkbox" value="1" <?php if (isset($stat)) : ?> checked <?php endif; ?>>
-                        Visualizza statistiche
+                        Statistiche generali
                     </label>
 
                     <hr>
 
                     <label for="registrazioni">
                         <input id="registrazioni" name="registrazioni" type="checkbox" value="1" <?php if (isset($registrazioni)) : ?> checked <?php endif; ?>>
-                        Visualizza registrazioni
+                        Registrazioni
                     </label>
 
                     <hr>
 
                     <label for="lingue">
                         <input id="lingue" name="lingue" type="checkbox" value="1" <?php if (isset($lingue)) : ?> checked <?php endif; ?>>
-                        Visualizza lingue
+                        Lingue
                     </label>
 
                     <hr>
 
                     <label for="anni">
                         <input id="anni" name="anni" type="checkbox" value="1" <?php if (isset($anni)) : ?> checked <?php endif; ?>>
-                        Visualizza anni
+                        Andamento negli anni
                     </label>
 
                     <hr>
@@ -345,7 +355,7 @@ if (!empty($stat)) {
                     <label for="id_pagina">Seleziona una pagina</label>
                     <select id="id_pagina" name="id_pagina">
                         <option></option>
-                        <?php foreach ($data_pages as $name => $id_page) : ?>
+                        <?php foreach ($labelPages as $name => $id_page) : ?>
                             <option value="<?php echo $id_page ?>" <?php if (isset($id_pagina) && $id_page == $id_pagina) : ?> selected="selected" <?php endif; ?>><?php echo $name ?></option>
                         <?php endforeach; ?>
                     </select>
@@ -366,19 +376,19 @@ if (!empty($stat)) {
                     <label for="lingua">Seleziona una lingua</label>
                     <select id="lingua" name="lingua">
                         <option></option>
-                        <?php foreach ($lang as $l) : ?>
-                            <option value="<?php echo $l ?>" <?php if (isset($lingua) && $l == $lingua) : ?> selected="selected" <?php endif; ?>><?php echo $l ?></option>
+                        <?php foreach ($lang as $langNumber) : ?>
+                            <option value="<?php echo $langNumber ?>" <?php if (isset($lingua) && $langNumber == $lingua) : ?> selected="selected" <?php endif; ?>><?php echo $langNumber ?></option>
                         <?php endforeach; ?>
 
                     </select>
 
                     <hr>
 
-                    <label for="anno_partenza">Anno partenza</label>
-                    <select id="anno_partenza" name="anno_partenza">
+                    <label for="startYear">Anno partenza</label>
+                    <select id="startYear" name="startYear">
                         <option></option>
-                        <?php for ($i = 2022; $i <= $year; $i++) : ?>
-                            <option value="<?php echo $i ?>" <?php if (isset($anno_partenza) && $i == $anno_partenza) : ?> selected="selected" <?php endif; ?>><?php echo $i ?></option>
+                        <?php for ($i = 2022; $i <= $currentYear; $i++) : ?>
+                            <option value="<?php echo $i ?>" <?php if (isset($startYear) && $i == $startYear) : ?> selected="selected" <?php endif; ?>><?php echo $i ?></option>
                         <?php endfor; ?>
 
                     </select>
@@ -390,48 +400,25 @@ if (!empty($stat)) {
 
         <hr class="spacer">
 
+
+
         <div class="data">
 
-            <?php if (isset($stat)) : ?>
-                <div class="card number">
+            <?php foreach ($dataOnly as $data) :
+                print_r(render('./analytics/data.php', array('data' => $data)));
+            endforeach; ?>
 
+            <?php foreach ($graphAndData as $data) :
+                print_r(render('./analytics/graphAndData.php', array('data' => $data)));
+            endforeach; ?>
 
-                    <?php foreach ($stats as $s => $value) : ?>
-                        <div>
-                            <h2><?php echo $s ?></h2>
-
-                            <?php foreach ($stats[$s] as $sv => $svalue) : ?>
-                                <div><?php echo $svalue ?></div>
-                            <?php endforeach; ?>
-
-                        </div>
-
-                        <?php if ($s != array_key_last($stats)) : ?>
-                            <hr class="spacer">
-                        <?php endif; ?>
-
-                    <?php endforeach; ?>
-
-                    <!-- <hr class="spacer">
-
-                <div>
-                    <h2>Legenda colori</h2>
-                    <?php foreach ($lang_ as $l => $value) : ?>
-                        <div style="background-color: <?php echo $color_list[$l] ?>"><?php echo $value ?></div>
-                    <?php endforeach; ?>
-                </div> -->
-                </div>
-            <?php endif; ?>
-
-
-            <?php foreach ($plots as $plot => $value) : ?>
-                <div class="card graph">
-                    <h2><?php echo $plot ?></h2>
-                    <img src="<?php echo $value->EncodeImage() ?>" alt=<?php echo $plot ?>>
-                </div>
-            <?php endforeach; ?>
+            <?php foreach ($graphOnly as $data) :
+                print_r(render('./analytics/graph.php', array('data' => $data)));
+            endforeach; ?>
 
         </div>
+
+
 
     </main>
 

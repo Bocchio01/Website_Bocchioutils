@@ -264,7 +264,7 @@ unset($_POST);
 
                         <hr style="width: 80%">
 
-                        <a href="analytics.php?l=<?= $locale ?>">
+                        <a href="analytics.php?l=<?= $locale ?>&stat=1">
                             <div class="card graph hover">
                                 <h2><?= $i18n['default'][2] ?></h2>
                                 <img src="../../_img/index/Analytics.svg" alt=<?= $i18n['default'][2] ?>>

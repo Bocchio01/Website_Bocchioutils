@@ -30,7 +30,6 @@ if ($login) {
     //         'BWS_Interactions',
     //         'BWS_Forum',
     //         'BWS_Traduction',
-    //         'BWS_Stats',
     //     ),
     // ));
 

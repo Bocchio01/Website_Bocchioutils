@@ -15,7 +15,10 @@
         Another month has passed and some new articles and portals have appeared on Bocchio's WebSite.<br>
         Hurry up and have a look!<br>
     </p>
-    <?php echo $msg ?>
+    <p>New pages:</p>
+    <?php echo $msg_new ?>
+    <p>Updated pages:</p>
+    <?php echo $msg_updated ?>
     <p>
         Remember that you can always opt out of receiving such emails by unsubscribing from the site's personal area.<br><br>
         The WebMaster of Bocchio's WebSite,<br>

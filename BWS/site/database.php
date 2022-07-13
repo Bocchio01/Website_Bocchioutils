@@ -21,37 +21,16 @@ $i18n = $i18n['database'];
     <style>
         @import url("../../style.css");
 
-        table {
-            border-collapse: collapse;
-            width: 90%;
-            margin: auto;
-            overflow-x: hidden;
-        }
-
-        th,
-        td {
-            text-align: left;
-            padding: 8px;
-            white-space: nowrap;
-        }
-
-        th {
-            background-color: orange;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        tr:nth-child(even) {
-            background-color: white;
-        }
-
         main {
             text-align: center;
             /* overflow: auto; */
             display: block !important;
+        }
+
+        table {
+            display: block;
+            overflow: auto;
+            border-width: 0px;
         }
     </style>
 </head>
@@ -89,7 +68,7 @@ $i18n = $i18n['database'];
 
         <?php else :
 
-            $tables = array('BWS_Users', 'BWS_Pages', 'BWS_Forum', 'BWS_Stats', 'BWS_Translations', 'BWS_Interactions');
+            $tables = array('BWS_Users', 'BWS_Pages', 'BWS_Forum', 'BWS_Translations', 'BWS_Interactions');
             foreach ($tables as $key => $table) {
 
                 $res = Query("SELECT * FROM $table");

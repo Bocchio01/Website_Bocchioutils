@@ -4,7 +4,11 @@ include_once "_env.php";
 include_once "_functions.php";
 
 // Setting
-$http_origin = $_SERVER['HTTP_ORIGIN'];
+if (array_key_exists('HTTP_ORIGIN', $_SERVER)) {
+    $http_origin = $_SERVER['HTTP_ORIGIN'];
+} else {
+    $http_origin = "http://localhost:3000";
+}
 
 if ($http_origin == HOST_URL || $http_origin == "https://www.bocchio.dev" || $http_origin == "https://bocchio.netlify.app") {
     header("Access-Control-Allow-Origin: $http_origin");

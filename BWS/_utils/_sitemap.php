@@ -14,8 +14,6 @@ if ($login) {
     $xpath->registerNameSpace('s', 'http://www.sitemaps.org/schemas/sitemap/0.9');
     $xpath->registerNameSpace('x', 'http://www.w3.org/1999/xhtml');
 
-    echo "New pages:\n";
-
     foreach ($xpath->evaluate('//s:url') as $url) {
         $data = [
             'en' => str_replace(HOST_URL, '', $xpath->evaluate('string(x:link[@hreflang="en"]/@href)', $url)),
@@ -30,7 +28,8 @@ if ($login) {
             Query("INSERT INTO BWS_Translations (id_page, it, en) VALUES ($id_page, '$data[it]', '$data[en]')");
             Query("INSERT INTO BWS_Interactions (id_page) VALUES ($id_page)");
 
-            echo "\t" . $id_page . " - " . $data['en'] . "\n";
+            echo "New page:\t" . $id_page . " - " . $data['en'] . "\n";
         }
     }
+    echo "Complete!\n";
 }

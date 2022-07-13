@@ -12,6 +12,7 @@ $sql[] = "CREATE TABLE IF NOT EXISTS BWS_Pages (
     forum BOOLEAN DEFAULT NULL,
     attachment JSON DEFAULT NULL,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_modify TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id_page))
     ENGINE=InnoDB";
@@ -83,18 +84,6 @@ $sql[] = "CREATE TABLE IF NOT EXISTS BWS_Translations (
     FOREIGN KEY (id_page) REFERENCES BWS_Pages(id_page) ON DELETE CASCADE ON UPDATE CASCADE)
     ENGINE=InnoDB";
 
-
-// BWS_Stats table
-$sql[] = "CREATE TABLE IF NOT EXISTS BWS_Stats (
-    id INT(4) NOT NULL AUTO_INCREMENT,
-    year YEAR NULL,
-    loading INT(5) DEFAULT 0,
-    standalone INT(5) DEFAULT 0,
-    total_pageview INT(5) DEFAULT 0,
-
-    PRIMARY KEY (id),
-    UNIQUE(year))
-    ENGINE=InnoDB";
 
 
 $sql[] = "INSERT INTO BWS_Pages (name) VALUES ('Error page')";

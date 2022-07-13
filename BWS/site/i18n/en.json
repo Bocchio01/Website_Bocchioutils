@@ -99,7 +99,15 @@
 
     "database": {
         "title": "Bocchio's WebSite Database",
+        "subtitle": "Main site",
         "h2": "Identification",
         "p": "You must be authorised to access this data."
+    },
+
+    "analytics": {
+        "title": "Bocchio's WebSite Analytics",
+        "subtitle": "Main site",
+        "h2": "Identificazione",
+        "p": "Per accedere a questi dati bisogna essere autorizzati."
     }
 }
