@@ -107,6 +107,12 @@ unset($_POST);
             width: 300px;
             max-width: 100%;
         }
+
+        @media (max-width: 800px) {
+            .graph>img {
+                width: 200px;
+            }
+        }
     </style>
 </head>
 
@@ -264,7 +270,7 @@ unset($_POST);
 
                         <hr style="width: 80%">
 
-                        <a href="analytics.php?l=<?= $locale ?>&stat=1">
+                        <a href="analytics.php?l=<?= $locale ?>&isStatistics=1">
                             <div class="card graph hover">
                                 <h2><?= $i18n['default'][2] ?></h2>
                                 <img src="../../_img/index/Analytics.svg" alt=<?= $i18n['default'][2] ?>>

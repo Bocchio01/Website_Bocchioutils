@@ -42,11 +42,11 @@ function DefaultGraph($data, $type = 'linepoints')
 function graphAndData(String $query)
 {
 
-    global $langArray, $startYear, $currentYear, $currentMonth;
+    global $langArray, $byYear, $currentYear, $currentMonth;
 
     $idArray = Query($query)->fetch_array(MYSQLI_ASSOC)['idArray'];
 
-    for ($i = $startYear; $i <= $currentYear; $i++) {
+    for ($i = $byYear; $i <= $currentYear; $i++) {
         if ($i == $currentYear) $nMonth = $currentMonth;
         else $nMonth = 12;
 
@@ -75,32 +75,77 @@ $currentMonth = (int) date("m") - 1;
 $graphAndData = array();
 $graphOnly = array();
 $dataOnly = array();
+$latestVisits = array();
 
-
-extract($_GET);
-
-$langArray = empty($lingua) ? $lang : array($lingua);
 $width = empty($width) ? 600 : $width;
 $height = $width * 4 / 6;
 
-$startYear = empty($startYear) ? "2022" : $startYear;
+
+
+$langArray = $lang;
+$byYear = 2022;
+$n = 0;
+
+extract($_GET);
+$langArray = !empty($byLang) ? array($byLang) : $lang;
+
+
+$table = array();
+
+$form = array();
+$form['checkbox'] = array(
+    array("id" => "isStatistics", "label" => "Statistiche generali", "value" => isset($isStatistics), "isChecked" => isset($isStatistics)),
+    array("id" => "isRegistration", "label" => "Registrazioni", "value" => isset($isRegistration), "isChecked" => isset($isRegistration)),
+    array("id" => "isLanguage", "label" => "Lingue", "value" => isset($isLanguage), "isChecked" => isset($isLanguage)),
+    array("id" => "isYears", "label" => "Andamento negli anni", "value" => isset($isYears), "isChecked" => isset($isYears))
+);
+
+$form['select'] = array(
+    "byName" => array("id" => "byName", "isMultiple" => true, "label" => "Seleziona una pagina", "hasEmptyOption" => false),
+    "byType" => array("id" => "byType", "isMultiple" => true, "label" => "Seleziona una tipologia", "hasEmptyOption" => false),
+    "byLang" => array("id" => "byLang", "isMultiple" => false, "label" => "Seleziona una lingua", "hasEmptyOption" => true),
+    "byYear" => array("id" => "byYear", "isMultiple" => false, "label" => "Anno partenza", "hasEmptyOption" => true)
+);
 
 
 // Dati generali
-$result = Query("SELECT id_page, CONCAT(name, ' - (' , type, ')') AS label FROM BWS_Pages ORDER BY type, last_modify");
-while ($row = $result->fetch_array(MYSQLI_ASSOC)) $labelPages[$row['label']] = $row['id_page'];
+$result = Query("SELECT p.id_page as id, p.type as type FROM BWS_Pages AS p JOIN BWS_Interactions AS i WHERE p.id_page = i.id_page AND i.last_modify >= DATE(NOW() - INTERVAL 7 DAY)");
+while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+    $latestVisits['id'][] = $row['id'];
+    $latestVisits['type'][] = $row['type'];
+}
+
+$result = Query("SELECT p.id_page as id, CONCAT(p.name, ' - (' , p.type, ')') AS label FROM BWS_Pages AS p JOIN BWS_Interactions AS i WHERE p.id_page = i.id_page AND p.id_page != 11 ORDER BY i.last_modify DESC");
+while ($row = $result->fetch_array(MYSQLI_ASSOC)) $form['select']['byName']['data'][] = array("optionLabel" => $row['label'], "value" => $row['id'], "isSelected" => isset($byName) ? in_array($row['id'], $byName) : false, "isLatestVisit" => $row['id'] == 11 ? in_array($row['id'], $latestVisits['id']) : false);
+
+$result = Query("SELECT p.type as type FROM BWS_Pages AS p JOIN BWS_Interactions AS i WHERE p.id_page = i.id_page AND p.id_page != 11 GROUP BY p.type ORDER BY i.last_modify DESC");
+while ($row = $result->fetch_array(MYSQLI_ASSOC)) $form['select']['byType']['data'][] = array("optionLabel" => $row['type'], "value" => $row['type'], "isSelected" => isset($byType) ? in_array($row['type'], $byType) : false, "isLatestVisit" => $row['type'] == 11 ? in_array($row['type'], $latestVisits['type']) : false);
+
+foreach ($lang as $langNumber => $langName) $form['select']['byLang']['data'][] = array("optionLabel" => $langName, "value" => $langName, "isSelected" => (isset($byLang) && $langName == $byLang), "isLatestVisit" => null);
+
+for ($year = 2022; $year <= $currentYear; $year++) $form['select']['byYear']['data'][] = array("optionLabel" => $year, "value" => $year, "isSelected" => (isset($byYear) && $year == $byYear), "isLatestVisit" => null);
+
+// header('Content-Type: application/json; charset=utf-8');
+// print_r($form['select'][3]);
 
 
 
-if (!empty($stat)) {
+if (!empty($isStatistics)) {
     // Andamento generale del sito
-    $result = Query("SELECT type, COUNT(id_page) as num FROM BWS_Pages GROUP BY type");
-    while ($row = $result->fetch_array(MYSQLI_ASSOC)) $dataz[$row['type']] = $row['num'];
+    $table[++$n] = array();
+    $table[$n]['title'] = 'Statistiche generali';
 
-    $row = Query("SELECT COUNT(id_page) as num FROM BWS_Forum")->fetch_array(MYSQLI_ASSOC);
-    $dataz['Forum'] = $row['num'];
+    $result = Query("SELECT type, COUNT(id_page) as countOfType FROM BWS_Pages GROUP BY type");
+    while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+        $table[$n]['head'][] = $row['type'];
+        $table[$n]['body'][0][] = $row['countOfType'];
+    };
+    $table[$n]['head'][] = 'Forum';
+    $table[$n]['body'][0][] = Query("SELECT COUNT(id_page) as countOfForum FROM BWS_Forum")->fetch_array(MYSQLI_ASSOC)['countOfForum'];
+    // header('Content-Type: application/json; charset=utf-8');
+    // print_r($table[$n]);
 
-    $dataOnly[] = $dataz;
+    // $dataOnly[] = $dataz;
 
     $example_data = graphAndData("SELECT GROUP_CONCAT(id_page) AS idArray FROM BWS_Pages WHERE id_page != 11");
     $data['graph'] = DefaultGraph($example_data);
@@ -122,59 +167,62 @@ if (!empty($stat)) {
 
 
 // Andamento: Gorlu la stampante
-if (!empty($id_pagina)) {
+if (!empty($byName)) {
+    foreach ($byName as $number => $id) {
+        $example_data = graphAndData("SELECT GROUP_CONCAT(id_page) AS idArray FROM BWS_Pages WHERE id_page = $id");
 
-    $example_data = graphAndData("SELECT GROUP_CONCAT(id_page) AS idArray FROM BWS_Pages WHERE id_page = $id_pagina");
+        $data['graph'] = DefaultGraph($example_data);
+        $data['graph']->SetYTitle('Numero visite per mese');
+        $data['graph']->DrawGraph();
 
-    $data['graph'] = DefaultGraph($example_data);
-    $data['graph']->SetYTitle('Numero visite per mese');
-    $data['graph']->DrawGraph();
+        $data['title'] = $form['select']['byName']['data'][array_search($id, array_column($form['select']['byName']['data'], 'value'))]['optionLabel'];
 
-    $data['title'] = array_search($id_pagina, $labelPages);
+        $lastTwoMonths = array_slice($example_data, -2, 2);
+        foreach ($langArray as $langNumber => $langName) {
+            $data['current'][$langName] = $lastTwoMonths[1][$langNumber + 1];
+            $data['prev'][$langName] = $lastTwoMonths[0][$langNumber + 1];
+            $data['total'][$langName] = array_sum(array_column($example_data, $langNumber + 1));
+        }
 
-    $lastTwoMonths = array_slice($example_data, -2, 2);
-    foreach ($langArray as $langNumber => $langName) {
-        $data['current'][$langName] = $lastTwoMonths[1][$langNumber + 1];
-        $data['prev'][$langName] = $lastTwoMonths[0][$langNumber + 1];
-        $data['total'][$langName] = array_sum(array_column($example_data, $langNumber + 1));
+        $example_data = null;
+        $graphAndData[] = $data;
     }
-
-    $example_data = null;
-    $graphAndData[] = $data;
 }
 
 
 // Andamento: Mix / Articoli...
-if (!empty($tipo_pagina)) {
+if (!empty($byType)) {
+    foreach ($byType as $number => $tipo) {
 
-    $example_data = graphAndData("SELECT GROUP_CONCAT(id_page) AS idArray FROM BWS_Pages WHERE type = '$tipo_pagina' AND id_page != 11");
+        $example_data = graphAndData("SELECT GROUP_CONCAT(id_page) AS idArray FROM BWS_Pages WHERE type = '$tipo' AND id_page != 11");
 
-    $data['graph'] = DefaultGraph($example_data);
-    $data['graph']->SetYTitle('Numero visite per mese');
-    $data['graph']->DrawGraph();
+        $data['graph'] = DefaultGraph($example_data);
+        $data['graph']->SetYTitle('Numero visite per mese');
+        $data['graph']->DrawGraph();
 
-    $data['title'] = $tipo_pagina;
+        $data['title'] = $tipo;
 
-    $lastTwoMonths = array_slice($example_data, -2, 2);
-    foreach ($langArray as $langNumber => $langName) {
-        $data['current'][$langName] = $lastTwoMonths[1][$langNumber + 1];
-        $data['prev'][$langName] = $lastTwoMonths[0][$langNumber + 1];
-        $data['total'][$langName] = array_sum(array_column($example_data, $langNumber + 1));
+        $lastTwoMonths = array_slice($example_data, -2, 2);
+        foreach ($langArray as $langNumber => $langName) {
+            $data['current'][$langName] = $lastTwoMonths[1][$langNumber + 1];
+            $data['prev'][$langName] = $lastTwoMonths[0][$langNumber + 1];
+            $data['total'][$langName] = array_sum(array_column($example_data, $langNumber + 1));
+        }
+
+        $example_data = null;
+        $graphAndData[] = $data;
     }
-
-    $example_data = null;
-    $graphAndData[] = $data;
 }
 
 
 
 // Registrazioni al sito
-if (!empty($registrazioni)) {
+if (!empty($isRegistration)) {
     foreach ($langArray as $langNumber => $langName) $data[$langName] = 0;
 
     $ser = "'" . implode("','", $langArray) . "'";
 
-    for ($i = $startYear; $i <= $currentYear; $i++) {
+    for ($i = $byYear; $i <= $currentYear; $i++) {
 
         if ($i == $currentYear) $nMonth = $currentMonth;
         else $nMonth = 12;
@@ -203,7 +251,7 @@ if (!empty($registrazioni)) {
 
 
 // Lingue
-if (!empty($lingue)) {
+if (!empty($isLanguage)) {
 
     $example_data = graphAndData("SELECT GROUP_CONCAT(id_page) AS idArray FROM BWS_Pages WHERE id_page != 11");
 
@@ -219,12 +267,12 @@ if (!empty($lingue)) {
 
 
 
-if (!empty($anni)) {
-    // Andamento negli anni (tripla colona per le tre lingue e )
+if (!empty($isYears)) {
+    // Andamento negli anni (tripla colona per le tre isLanguage e )
     // $datat = array(array('currentYear', 40, 5, 10, 3), array('Feb', 90, 8, 15, 4));
 
 
-    for ($i = $startYear; $i <= $currentYear; $i++) {
+    for ($i = $byYear; $i <= $currentYear; $i++) {
         $result = Query("SELECT GROUP_CONCAT(id_page) AS idArray, type FROM BWS_Pages WHERE type != 'Non definito' AND id_page != 11 GROUP BY type");
         $set = array();
         $example_data = array();
@@ -283,10 +331,6 @@ if (!empty($anni)) {
     <style>
         @import url("../../style.css");
 
-        form>div {
-            display: block;
-        }
-
         form>div>div {
             display: grid;
         }
@@ -319,83 +363,28 @@ if (!empty($anni)) {
 
         <form method="GET">
             <div class="card">
-
                 <div>
-                    <label for="stat">
-                        <input id="stat" name="stat" type="checkbox" value="1" <?php if (isset($stat)) : ?> checked <?php endif; ?>>
-                        Statistiche generali
-                    </label>
+                    <?php foreach ($form['checkbox'] as $elName => $elValue) : ?>
+                        <label for="<?php echo $elValue['id'] ?>">
+                            <input id="<?php echo $elValue['id'] ?>" name="<?php echo $elValue['id'] ?>" type="checkbox" value="1" <?php echo $elValue['isChecked'] ? "checked" : "" ?>>
+                            <?php echo $elValue['label'] ?>
+                        </label>
+                    <?php endforeach; ?>
 
-                    <hr>
-
-                    <label for="registrazioni">
-                        <input id="registrazioni" name="registrazioni" type="checkbox" value="1" <?php if (isset($registrazioni)) : ?> checked <?php endif; ?>>
-                        Registrazioni
-                    </label>
-
-                    <hr>
-
-                    <label for="lingue">
-                        <input id="lingue" name="lingue" type="checkbox" value="1" <?php if (isset($lingue)) : ?> checked <?php endif; ?>>
-                        Lingue
-                    </label>
-
-                    <hr>
-
-                    <label for="anni">
-                        <input id="anni" name="anni" type="checkbox" value="1" <?php if (isset($anni)) : ?> checked <?php endif; ?>>
-                        Andamento negli anni
-                    </label>
-
-                    <hr>
-
-                </div>
-
-                <div>
-                    <label for="id_pagina">Seleziona una pagina</label>
-                    <select id="id_pagina" name="id_pagina">
-                        <option></option>
-                        <?php foreach ($labelPages as $name => $id_page) : ?>
-                            <option value="<?php echo $id_page ?>" <?php if (isset($id_pagina) && $id_page == $id_pagina) : ?> selected="selected" <?php endif; ?>><?php echo $name ?></option>
-                        <?php endforeach; ?>
-                    </select>
-
-                    <hr>
-
-                    <label for="tipo_pagina">Seleziona una tipologia</label>
-                    <select id="tipo_pagina" name="tipo_pagina">
-                        <option></option>
-                        <?php foreach ($type_page as $type) : ?>
-                            <option value="<?php echo $type ?>" <?php if (isset($tipo_pagina) && $type == $tipo_pagina) : ?> selected="selected" <?php endif; ?>><?php echo $type ?></option>
-                        <?php endforeach; ?>
-
-                    </select>
-
-                    <hr>
-
-                    <label for="lingua">Seleziona una lingua</label>
-                    <select id="lingua" name="lingua">
-                        <option></option>
-                        <?php foreach ($lang as $langNumber) : ?>
-                            <option value="<?php echo $langNumber ?>" <?php if (isset($lingua) && $langNumber == $lingua) : ?> selected="selected" <?php endif; ?>><?php echo $langNumber ?></option>
-                        <?php endforeach; ?>
-
-                    </select>
-
-                    <hr>
-
-                    <label for="startYear">Anno partenza</label>
-                    <select id="startYear" name="startYear">
-                        <option></option>
-                        <?php for ($i = 2022; $i <= $currentYear; $i++) : ?>
-                            <option value="<?php echo $i ?>" <?php if (isset($startYear) && $i == $startYear) : ?> selected="selected" <?php endif; ?>><?php echo $i ?></option>
-                        <?php endfor; ?>
-
-                    </select>
+                    <?php foreach ($form['select'] as $elName => $elValue) : ?>
+                        <label for="<?php echo $elValue['id'] ?>"><?php echo $elValue['label'] ?></label>
+                        <select id="<?php echo $elValue['id'] ?>" name="<?php echo $elValue['isMultiple'] ? $elValue['id'] . "[]" : $elValue['id'] ?>" <?php echo $elValue['isMultiple'] ? "multiple" : "" ?>>
+                            <?php if ($elValue['hasEmptyOption']) : ?> <option></option><?php endif; ?>
+                            <?php foreach ($elValue['data'] as $dataName => $dataValue) : ?>
+                                <option value="<?php echo $dataValue['value'] ?>" style="<?php echo $dataValue['isLatestVisit'] ? "font-weight:bold;" : "" ?>" <?php echo $dataValue['isSelected'] ? "selected" : "" ?>><?php echo $dataValue['optionLabel'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php endforeach; ?>
                 </div>
             </div>
 
             <input type="submit" name="submit" value="Genera">
+
         </form>
 
         <hr class="spacer">
@@ -404,7 +393,7 @@ if (!empty($anni)) {
 
         <div class="data">
 
-            <?php foreach ($dataOnly as $data) :
+            <?php foreach ($table as $data) :
                 print_r(render('./analytics/data.php', array('data' => $data)));
             endforeach; ?>
 

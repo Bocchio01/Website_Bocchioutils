@@ -1,0 +1,104 @@
+{
+  "form": {
+    "checkbox": [
+      {
+        "id": "stat",
+        "label": "Statistiche generali",
+        "value": "$0/1",
+        "isChecked": true
+      },
+      {
+        "id": "registrazioni",
+        "label": "Registrazioni",
+        "value": "$0/1",
+        "isChecked": true
+      },
+      {
+        "id": "lingue",
+        "label": "Lingue",
+        "value": "$0/1",
+        "isChecked": true
+      },
+      {
+        "id": "anni",
+        "label": "Andamento negli anni",
+        "value": "$0/1",
+        "isChecked": true
+      }
+    ],
+    "select": [
+      {
+        "id": "id_pagina",
+        "isMultiple": true,
+        "label": "Seleziona una pagina",
+        "hasEmptyOption": false,
+        "data": [
+          {
+            "optionLabel": "$namePage",
+            "value": "$idPage",
+            "isSelected": true,
+            "isLatestVisit": true
+          }
+        ]
+      },
+      {
+        "id": "tipo_pagina",
+        "isMultiple": true,
+        "label": "Seleziona una tipologia",
+        "hasEmptyOption": false,
+        "data": [
+          {
+            "optionLabel": "$nameType",
+            "value": "$type",
+            "isSelected": true,
+            "isLatestVisit": true
+          }
+        ]
+      },
+      {
+        "id": "lingua",
+        "isMultiple": false,
+        "label": "Seleziona una lingua",
+        "hasEmptyOption": true,
+        "data": [
+          {
+            "optionLabel": "$langName",
+            "value": "$langName",
+            "isSelected": true,
+            "isLatestVisit": false
+          }
+        ]
+      },
+      {
+        "id": "startYear",
+        "isMultiple": false,
+        "label": "Anno partenza",
+        "hasEmptyOption": true,
+        "data": [
+          {
+            "optionLabel": "$year",
+            "value": "$year",
+            "isSelected": true,
+            "isLatestVisit": false
+          }
+        ]
+      }
+    ]
+  },
+  "table": [
+    {
+      "title": "Titolo tabella",
+      // "head": ["", "IT", "EN", "TOT"],
+      // "body": [
+      //   ["Visite mese corrente", 1, 0, 1],
+      //   ["Visite mese precedente", 12, 13, 25]
+      // ]
+      "data": [
+        ["", "Visite mese corrente", "Visite mese precedente", "Visite totali"],
+        ["IT", 1, 12, 84],
+        ["EN", 0, 13, 50],
+        ["TOT", 1, 25, 134]
+      ]
+    }
+  ]
+}

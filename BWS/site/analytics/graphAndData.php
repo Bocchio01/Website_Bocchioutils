@@ -1,6 +1,6 @@
 <div class="card graph-container">
 
-    <div class="card" style="width: 500px;">
+    <div class="card">
 
         <h2><?php echo $data['title'] ?></h2>
 
@@ -32,7 +32,7 @@
                     <td><?php echo array_sum($data['prev']) ?></td>
                 </tr>
                 <tr>
-                    <td>Visite mese totali</td>
+                    <td>Visite totali</td>
                     <?php foreach ($data['total'] as $l => $value) : ?>
                         <td><?php echo $value ?></td>
                     <?php endforeach; ?>

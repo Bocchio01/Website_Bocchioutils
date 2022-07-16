@@ -13,12 +13,14 @@ body {
   background-color: #f0f0f2;
   font-family: "Segoe UI";
 }
-body header > div > h1,
-body footer > h2 {
+
+h1,
+h2 {
   margin-block: 15px;
   text-align: center;
 }
-body header > div {
+
+header > div {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,28 +28,96 @@ body header > div {
   -moz-column-gap: 20px;
        column-gap: 20px;
 }
-body header > div > a > img {
+header > div > a > img {
   margin: auto;
   height: 50px;
 }
-body main {
+
+main {
   display: flex;
   align-items: flex-start;
   flex-basis: initial;
   align-items: stretch;
 }
-body main form {
+
+.data {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  align-content: flex-start;
+  width: 100%;
+  overflow: auto;
+}
+
+.card {
+  box-shadow: 2px 3px 7px 2px rgba(0, 0, 0, 0.4);
+  margin: 15px;
+  border-radius: 0.5em;
+  background-color: #fdfdff;
+  padding: 2em;
+  overflow: auto;
+}
+
+hr {
+  margin-block: 20px;
+  margin-inline: 1em;
+}
+
+.graph-container {
+  display: flex;
+  text-align: center;
+  justify-content: space-between;
+  align-items: center;
+  overflow: auto;
+}
+.graph-container > .card {
+  overflow: initial;
+}
+
+.hover:hover {
+  transform: scale(1.03);
+}
+
+table {
+  border-collapse: collapse;
+  width: 90%;
+  margin: auto;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px;
+  white-space: nowrap;
+}
+
+th {
+  background-color: orange;
+  color: white;
+  text-transform: uppercase;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+  background-color: white;
+}
+
+form {
   flex-shrink: 0;
   display: block;
   margin: 0px;
 }
-body main form > div {
+form > div {
   padding: 1em;
   margin: 15px;
   font-size: 20px;
   display: grid;
 }
-body main form > input {
+form > input {
   width: 100%;
   border-radius: 0.5em;
   background-color: #ff9800;
@@ -59,69 +129,8 @@ body main form > input {
   margin-block: 15px;
   cursor: pointer;
 }
-body main form > input:hover {
+form > input:hover {
   color: black;
-}
-body main hr.spacer {
-  margin-inline: 20px;
-}
-body main > div.data {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-  align-items: flex-start;
-  width: 100%;
-  overflow: auto;
-}
-body .card {
-  box-shadow: 2px 3px 7px 2px rgba(0, 0, 0, 0.4);
-  margin: 15px;
-  border-radius: 0.5em;
-  background-color: #fdfdff;
-  padding: 2em;
-}
-body .card hr {
-  margin-block: 20px;
-  margin-inline: 0.5em;
-}
-body .graph {
-  padding: 2em;
-}
-body .graph > h2 {
-  text-align: center;
-  margin-block: 0px 20px;
-}
-body .graph-container {
-  display: flex;
-  text-align: center;
-  justify-content: space-between;
-  align-items: center;
-  overflow: auto;
-}
-body .hover:hover {
-  transform: scale(1.03);
-}
-body table {
-  border-collapse: collapse;
-  width: 90%;
-  margin: auto;
-}
-body th,
-body td {
-  text-align: left;
-  padding: 8px;
-  white-space: nowrap;
-}
-body th {
-  background-color: orange;
-  color: white;
-  text-transform: uppercase;
-}
-body tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-body tr:nth-child(even) {
-  background-color: white;
 }
 
 @media (max-width: 800px) {
@@ -131,7 +140,6 @@ body tr:nth-child(even) {
   main form > div.card {
     display: flex !important;
     overflow: auto;
-    justify-content: space-between;
     -moz-column-gap: 2em;
          column-gap: 2em;
   }
@@ -139,5 +147,40 @@ body tr:nth-child(even) {
     min-width: -webkit-fit-content;
     min-width: -moz-fit-content;
     min-width: fit-content;
+  }
+  main form > input {
+    padding: 5px 15px;
+    font-size: 15px;
+    margin-block: 5px;
+  }
+  main .graph-container {
+    display: block;
+    text-align: center;
+  }
+  main .graph-container img {
+    max-width: 100%;
+  }
+  main .graph-container > .card {
+    overflow: auto;
+  }
+  main .card {
+    margin: 5px;
+    padding: 1em;
+  }
+  main .card img {
+    max-width: 100%;
+  }
+  * {
+    font-size: 12px;
+  }
+  h2,
+h1 {
+    font-size: 15px;
+  }
+  header > div h1 > a {
+    font-size: 25px;
+  }
+  header > div a > img {
+    height: 30px;
   }
 }
