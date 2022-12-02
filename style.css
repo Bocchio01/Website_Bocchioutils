@@ -11,7 +11,7 @@ a:hover {
 
 body {
   background-color: #f0f0f2;
-  font-family: "Segoe UI";
+  font-family: 'Segoe UI';
 }
 
 h1,
@@ -26,7 +26,7 @@ header > div {
   justify-content: center;
   flex-wrap: wrap;
   -moz-column-gap: 20px;
-       column-gap: 20px;
+  column-gap: 20px;
 }
 header > div > a > img {
   margin: auto;
@@ -81,15 +81,20 @@ hr {
 
 table {
   border-collapse: collapse;
-  width: 90%;
+  width: fit-content;
+  max-width: 90%;
   margin: auto;
 }
 
 th,
 td {
+  border: 1px solid gray;
   text-align: left;
   padding: 8px;
   white-space: nowrap;
+  max-width: 800px;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 th {
@@ -141,7 +146,7 @@ form > input:hover {
     display: flex !important;
     overflow: auto;
     -moz-column-gap: 2em;
-         column-gap: 2em;
+    column-gap: 2em;
   }
   main form > div.card > div {
     min-width: -webkit-fit-content;
@@ -174,7 +179,7 @@ form > input:hover {
     font-size: 12px;
   }
   h2,
-h1 {
+  h1 {
     font-size: 15px;
   }
   header > div h1 > a {

@@ -66,24 +66,32 @@ $i18n = $i18n['database'];
                 </div>
             </div>
 
-        <?php else :
+            <?php else :
 
             $tables = array('BWS_Users', 'BWS_Pages', 'BWS_Forum', 'BWS_Translations', 'BWS_Interactions');
-            foreach ($tables as $key => $table) {
 
-                $res = Query("SELECT * FROM $table");
-                echo "<h2>$table</h2><table border='1'><thead><tr>";
-
-                while ($fieldinfo = $res->fetch_field()) echo "<th>$fieldinfo->name</th>";
-                echo "</tr></thead><tbody>";
-
-                while ($row = $res->fetch_array(MYSQLI_ASSOC)) {
-                    echo "<tr>";
-                    foreach ($row as $cell) echo "<td>" . htmlentities($cell) . "</td>";
-                    echo "</tr>";
-                }
-                echo "</tbody></table>";
-            }
+            foreach ($tables as $table) :
+                $return = Query("SELECT * FROM $table"); ?>
+                <h2> <?php echo $table ?></h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <?php while ($fieldinfo = $return->fetch_field()) : ?>
+                                <th> <?php echo $fieldinfo->name ?></th>
+                            <?php endwhile; ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = $return->fetch_array(MYSQLI_ASSOC)) : ?>
+                            <tr>
+                                <?php foreach ($row as $cell) : ?>
+                                    <td> <?php echo htmlentities($cell) ?></td>
+                                <?php endforeach; ?>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+        <?php endforeach;
 
         endif; ?>
 

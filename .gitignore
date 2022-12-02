@@ -1,4 +1,5 @@
 *.zip
+*.htaccess
 /_lib*
 /_dumpDB
 /_fonts*

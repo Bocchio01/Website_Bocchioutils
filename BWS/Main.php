@@ -21,10 +21,7 @@ switch ($_POST["action"]) {
         $month = (int) date("m") - 1;
 
         if (!Query("SHOW COLUMNS FROM BWS_Interactions LIKE '$year'")->num_rows) {
-            $json = array();
-            for ($i = 0; $i < 12; $i++) $json[] = new stdClass();
-
-            Query("ALTER TABLE BWS_Interactions ADD COLUMN `$year` JSON DEFAULT ('" . json_encode($json) . "')");
+            Query("ALTER TABLE BWS_Interactions ADD COLUMN `$year` JSON DEFAULT ('[{},{},{},{},{},{},{},{},{},{},{},{}]')");
         }
 
         if (isset($_COOKIE['token']) && Query("SELECT id_user FROM BWS_Users WHERE token = '$_COOKIE[token]'")->fetch_array(MYSQLI_ASSOC)['id_user'] == 2) break;
