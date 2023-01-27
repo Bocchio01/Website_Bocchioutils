@@ -33,6 +33,10 @@ function DefaultGraph($data, $type = 'linepoints')
     $plot->SetLineWidths(3);
     // $plot->SetYTickIncrement(1);
 
+    if (count($data) > 12) {
+        $plot->SetXLabelAngle(90);
+    }
+
     $plot->SetLegend($langArray);
 
     return $plot;
@@ -50,7 +54,7 @@ function graphAndData(String $query)
         if ($i == $currentYear) $nMonth = $currentMonth;
         else $nMonth = 12;
 
-        for ($j = 0; $j <= $nMonth; $j++) {
+        for ($j = 0; $j < $nMonth; $j++) {
 
             $sql = array();
             foreach ($langArray as $langNumber => $langName) $sql[] = "SUM(JSON_EXTRACT(`$i`, '$[$j].$langName')) AS $langName";
@@ -70,7 +74,7 @@ function graphAndData(String $query)
 
 
 $currentYear = (int) date("Y");
-$currentMonth = (int) date("m") - 1;
+$currentMonth = (int) date("m");
 
 $graphAndData = array();
 $graphOnly = array();
@@ -83,7 +87,7 @@ $height = $width * 4 / 6;
 
 
 $langArray = $lang;
-$byYear = 2022;
+$byYear = empty($_GET['fromYear']) ? 2022 : $_GET['fromYear'];;
 $n = 0;
 
 extract($_GET);
@@ -104,7 +108,7 @@ $form['select'] = array(
     "byName" => array("id" => "byName", "isMultiple" => true, "label" => "Seleziona una pagina", "hasEmptyOption" => false),
     "byType" => array("id" => "byType", "isMultiple" => true, "label" => "Seleziona una tipologia", "hasEmptyOption" => false),
     "byLang" => array("id" => "byLang", "isMultiple" => false, "label" => "Seleziona una lingua", "hasEmptyOption" => true),
-    "byYear" => array("id" => "byYear", "isMultiple" => false, "label" => "Anno partenza", "hasEmptyOption" => true)
+    "byYear" => array("id" => "byYear", "isMultiple" => false, "label" => "Anno partenza", "hasEmptyOption" => false)
 );
 
 

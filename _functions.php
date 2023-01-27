@@ -6,7 +6,7 @@ function returndata(int $code = 0, string $log = null)
     global $return_obj;
     $return_obj->Log[] = $log;
     $return_obj->Status = $code;
-    echo json_encode($return_obj);
+    echo json_encode($return_obj, JSON_PRETTY_PRINT);
 }
 
 

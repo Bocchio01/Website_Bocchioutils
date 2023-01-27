@@ -4,8 +4,8 @@ include_once "../../_setting.php";
 require_once "../../_isAdmin.php";
 
 if ($login) {
-    sleep(5);
     $xml = file_get_contents(HOST_URL . "/sitemap.xml" . '?' . mt_rand());
+    // $xml = file_get_contents(UTILS_SITE . "/sitemap.xml" . '?' . mt_rand());
 
     $document = new DOMDocument;
     $document->loadXML($xml);
@@ -14,14 +14,13 @@ if ($login) {
     $xpath->registerNameSpace('s', 'http://www.sitemaps.org/schemas/sitemap/0.9');
     $xpath->registerNameSpace('x', 'http://www.w3.org/1999/xhtml');
 
-
-    echo "Looking for new pages...\n";
-
     foreach ($xpath->evaluate('//s:url') as $url) {
         $data = [
+            'lastmod' => $xpath->evaluate('string(s:lastmod)', $url),
             'en' => str_replace(HOST_URL, '', $xpath->evaluate('string(x:link[@hreflang="en"]/@href)', $url)),
             'it' => str_replace(HOST_URL, '', $xpath->evaluate('string(x:link[@hreflang="it"]/@href)', $url)),
         ];
+
 
         $id_page = Query("SELECT id_page FROM BWS_Translations WHERE (it, en) = ('$data[it]', '$data[en]')")->fetch_array(MYSQLI_ASSOC)['id_page'];
 
@@ -31,8 +30,13 @@ if ($login) {
             Query("INSERT INTO BWS_Translations (id_page, it, en) VALUES ($id_page, '$data[it]', '$data[en]')");
             Query("INSERT INTO BWS_Interactions (id_page) VALUES ($id_page)");
 
-            echo "\t" . $id_page . " - " . $data['en'] . "\n";
+            echo "New page:\t" . $id_page . " - " . $data['en'] . "\n";
+        }
+
+
+        if ($data['lastmod'] && strpos($data['lastmod'], date("Y-m-d")) === false) {
+            $sqlDate = date('Y-m-d h:i:s', strtotime($data['lastmod']));
+            Query("UPDATE BWS_Pages SET last_modify = '$sqlDate' WHERE id_page = $id_page");
         }
     }
-    echo "Complete!\n";
 }
