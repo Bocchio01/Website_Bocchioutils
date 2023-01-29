@@ -10,13 +10,20 @@ $sql[] = "DROP TABLE IF EXISTS PLM_Professor";
 
 $sql[] = "CREATE TABLE IF NOT EXISTS PLM_Professor (
     id INT(4) NOT NULL AUTO_INCREMENT,
-    id_professor INT(4),
+    id_BWS INT(4) DEFAULT NULL,
+    name VARCHAR(127) NOT NULL,
+    surname VARCHAR(127) DEFAULT NULL,
+    email VARCHAR(127) DEFAULT NULL,
+    phone VARCHAR(127) DEFAULT NULL,
+
     token VARCHAR(127) NOT NULL,
     approved BOOLEAN DEFAULT 0,
 
+    last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     UNIQUE (token),
     PRIMARY KEY (id),
-    FOREIGN KEY (id_professor) REFERENCES BWS_Users(id_user) ON DELETE SET NULL ON UPDATE CASCADE)
+    FOREIGN KEY (id_BWS) REFERENCES BWS_Users(id_user) ON DELETE SET NULL ON UPDATE CASCADE)
     ENGINE=InnoDB";
 
 
@@ -30,10 +37,12 @@ $sql[] = "CREATE TABLE IF NOT EXISTS PLM_Alumni (
     surname VARCHAR(127) DEFAULT NULL,
     email VARCHAR(127) DEFAULT NULL,
 
+    default_subjects JSON DEFAULT ('[]'),
     default_price DECIMAL(4, 2) DEFAULT 0,
     default_extra DECIMAL(4, 2) DEFAULT 0,
 
     entry_password VARCHAR(127) NOT NULL,
+    last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE (entry_password),
     PRIMARY KEY (id_alumno),
