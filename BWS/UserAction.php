@@ -74,7 +74,13 @@ switch ($_POST["action"]) {
                     Query("UPDATE BWS_Users SET last_login=NOW() WHERE id_user = '$row[id_user]'");
 
                     if ($token || $autologin) Cookie($row['token']);
-                    else ClearCookie();
+                    else setcookie('token', "$row[token]", [
+                        'expires' => 0,
+                        'path' => '/',
+                        'samesite' => 'None',
+                        'secure' => 'Secure',
+                        'httponly' => false,
+                    ]);
                 } else {
                     ClearCookie();
                     die(returndata(1, "You mut verify your e-mail before logging in. Check your e-mail box."));

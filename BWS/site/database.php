@@ -68,11 +68,15 @@ $i18n = $i18n['database'];
 
             <?php else :
 
-            $tables = array('BWS_Users', 'BWS_Pages', 'BWS_Forum', 'BWS_Translations', 'BWS_Interactions');
+            $queries = array(
+                "BWS User Data" => "SELECT * FROM BWS_Users ORDER BY last_login DESC",
+                "BWS Page Data" => "SELECT P.id_page, P.name, I.last_modify, P.type, P.forum, P.attachment FROM BWS_Pages as P JOIN BWS_Interactions as I ON P.id_page = I.id_page WHERE I.last_modify >= DATE_SUB(NOW(), INTERVAL 7 DAY) ORDER BY I.last_modify DESC",
+                "PLM Alumni Data" => "SELECT * FROM PLM_Alumni WHERE JSON_CONTAINS(id_auth_professors, '1', '$') ORDER BY last_login DESC",
+            );
 
-            foreach ($tables as $table) :
-                $return = Query("SELECT * FROM $table"); ?>
-                <h2> <?php echo $table ?></h2>
+            foreach ($queries as $name_query => $query) :
+                $return = Query($query); ?>
+                <h2> <?php echo $name_query ?></h2>
                 <table>
                     <thead>
                         <tr>

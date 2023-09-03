@@ -34,8 +34,8 @@ function checkAuthorization()
 
         if ($row['approved'] == 1) {
 
-            setcookie('token', $row['BWS_token'], time() + 3600 * 24 * 30, '/');
-            setcookie('PLM_token', $row['token'], time() + 3600 * 24 * 30, '/');
+            // setcookie('token', $row['BWS_token'], time() + 3600 * 24 * 30, '/');
+            setcookie('PLM_token', $row['token'], 0, '/');
 
             return $row['id'];
         } else {

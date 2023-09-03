@@ -5,7 +5,7 @@ header('Content-Type: text/html; charset=utf-8');
 list($i18n, $locale, $notlocale) = LoadTranslation();
 $i18n = $i18n['analytics'];
 
-require_once '../../_lib/phplot-6.2.0/phplot.php';
+require_once '../../vendor/autoload.php';
 
 
 function DefaultGraph($data, $type = 'linepoints')

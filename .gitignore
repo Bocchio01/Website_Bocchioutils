@@ -5,4 +5,39 @@
 /_fonts*
 **log*
 
+/PLM_CLASS
 /PLM/_Insert
+/ATG
+/Orienteering
+/OAA
+
+# Composer
+/vendor/
+/composer.phar
+/composer.lock
+
+# IDEs and editors
+/.idea/
+/.vscode/
+/.project
+/.classpath
+
+# Logs and cache files
+/log/
+/tmp/
+/cache/
+
+# Dependency management
+/.composer/
+
+# Build files
+/build/
+
+# Environment-specific files
+/.env
+/.env.local
+/.env.*.local
+
+# Miscellaneous
+/.DS_Store
+Thumbs.db

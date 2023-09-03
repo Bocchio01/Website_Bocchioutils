@@ -363,7 +363,7 @@ function getAlumniList(int $id_professor): array
     $title = array('en' => 'Alumni data', 'it' => 'Dati alumni');
     $baseTab = array('name', 'surname', 'email', 'default_subjects', 'default_price', 'default_extra');
     $sudoTab = array('owner', 'name', 'surname', 'email', 'default_subjects', 'default_price', 'default_extra', 'entry_password');
-    $controls = array('modify', 'delete');
+    $controls = array('modify');
     $locale = array(
         'en' => array(
             'id' => 'ID',

@@ -1,6 +1,6 @@
 <?php
 
-require_once '../_lib/phplot-6.2.0/phplot.php';
+require_once '../vendor/autoload.ph';
 
 function DefaultGraph($data, $type = 'linepoints')
 {

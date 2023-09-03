@@ -1,0 +1,16 @@
+{
+  "name": "bocchio/bocchio_website_utils",
+  "description": "Web platform for Bocchio's website",
+  "homepage": "https://bocchioutils.altervista.org/",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Tommaso Bocchietti",
+      "email": "tommaso.bocchietti@gmail.com"
+    }
+  ],
+  "require": {
+    "davefx/phplot": "^6.2"
+  }
+}
