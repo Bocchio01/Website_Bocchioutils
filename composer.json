@@ -11,6 +11,8 @@
     }
   ],
   "require": {
-    "davefx/phplot": "^6.2"
+    "davefx/phplot": "^6.2",
+    "slim/slim": "4.*",
+    "slim/psr7": "^1.6"
   }
 }
