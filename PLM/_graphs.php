@@ -1,6 +1,6 @@
 <?php
 
-require_once '../vendor/autoload.ph';
+require_once '../vendor/autoload.php';
 
 function DefaultGraph($data, $type = 'linepoints')
 {
